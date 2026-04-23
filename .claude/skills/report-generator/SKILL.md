@@ -149,12 +149,51 @@ python <skill-path>/scripts/render_mermaid.py --input diagram.mmd --output figur
 - 表格必须有标题（`title` 字段）
 - 图片必须有说明（`caption` 字段）
 
-将合成结果保存为 JSON 文件：
+将合成结果保存为**简化内容描述**（不是完整 payload），然后用脚本自动构建：
 
 ```bash
-# 保存 payload
-# 路径：data/generated/<report_name>.json
+# 1. Claude 生成简化内容描述（比完整 payload 简单得多）
+# 保存到 data/generated/<report_name>_content.json
+
+# 2. 用 build_payload.py 自动构建合法 payload
+python <skill-path>/scripts/build_payload.py \
+  --content data/generated/<report_name>_content.json \
+  --output data/generated/<report_name>.json \
+  --template path/to/template.docx
 ```
+
+**简化内容描述格式**（Claude 只需要生成这个）：
+
+```json
+{
+  "title": "报告标题",
+  "org": "单位名称",
+  "leader": "负责人",
+  "period": "2026年1月-12月",
+  "sections": [
+    {
+      "name": "研究内容与技术路线",
+      "blocks": [
+        {"type": "heading", "text": "1.1 研究目标", "level": 2},
+        {"type": "paragraph", "text": "本项目旨在..."},
+        {"type": "table", "title": "表1", "headers": ["指标","目标"], "rows": [["准确率","95%"]]}
+      ]
+    }
+  ],
+  "attachments": [
+    {
+      "name": "经费预算",
+      "blocks": [
+        {"type": "appendix_table", "headers": ["科目","金额"], "rows": [["设备费","50万"]]}
+      ]
+    }
+  ]
+}
+```
+
+脚本自动完成：id/placeholder/flag_name 生成、style_map 合并、block 字段校验、template 契约检查。
+
+**中文章节名自动映射**：`"研究内容"` → `RESEARCH_CONTENT_SUBDOC`，`"实施计划"` → `IMPLEMENTATION_PLAN_SUBDOC`，等等。
 
 ### Phase 5: 渲染输出
 
