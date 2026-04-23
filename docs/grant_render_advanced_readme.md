@@ -1,5 +1,10 @@
 # 配套说明：多章节 subdoc + 多附件 + 可选章节开关
 
+> 本文档描述的是**当前 advanced 渲染原型的行为基线**。  
+> 如需推进 Phase 1 工程化重构，请以以下两份文档为准：  
+> - `docs/superpowers/plans/2026-04-23-report-engine-revised.md`  
+> - `docs/superpowers/specs/2026-04-23-report-engine-design.md`
+
 这套文件是对上一版示例的升级版，重点解决三个问题：
 
 1. 一个申报书里不止一个富内容章节；
