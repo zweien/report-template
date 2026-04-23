@@ -70,3 +70,22 @@ def test_image_block_missing_file(subdoc, style_map):
     registry = create_default_registry()
     registry.render(subdoc, {"type": "image", "path": "missing.png"}, style_map)
     assert any("图片缺失" in p.text for p in subdoc.paragraphs)
+
+def test_rich_paragraph_block(subdoc, style_map, registry):
+    block = {
+        "type": "rich_paragraph",
+        "segments": [
+            {"text": "普通文本 "},
+            {"text": "粗体", "bold": True},
+            {"text": " 斜体", "italic": True},
+            {"text": "H", "sub": True},
+            {"text": "2O"},
+        ],
+    }
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.paragraphs) == 1
+    p = subdoc.paragraphs[0]
+    assert len(p.runs) == 5
+    assert p.runs[0].text == "普通文本 "
+    assert p.runs[1].bold is True
+    assert p.runs[2].italic is True
