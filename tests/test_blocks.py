@@ -136,3 +136,49 @@ def test_p1_blocks_in_registry():
     assert "note" in registry._renderers
     assert "quote" in registry._renderers
     assert "two_images_row" in registry._renderers
+
+
+def test_appendix_table_block(subdoc, style_map, registry):
+    block = {
+        "type": "appendix_table",
+        "title": "附表1：经费预算",
+        "headers": ["项目", "金额"],
+        "rows": [["设备费", "50"]],
+    }
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.tables) == 1
+    table = subdoc.tables[0]
+    assert len(table.rows) == 2  # header + 1 data row
+
+
+def test_checklist_block(subdoc, style_map, registry):
+    block = {
+        "type": "checklist",
+        "items": [
+            {"text": "已完成文献综述", "checked": True},
+            {"text": "已提交伦理审查", "checked": False},
+        ],
+    }
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.paragraphs) == 2
+    assert "☑" in subdoc.paragraphs[0].text
+    assert "☐" in subdoc.paragraphs[1].text
+
+
+def test_horizontal_rule_block(subdoc, style_map, registry):
+    from docx.oxml.ns import qn
+    block = {"type": "horizontal_rule"}
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.paragraphs) == 1
+    p = subdoc.paragraphs[0]
+    pPr = p._element.pPr
+    assert pPr is not None
+    pBdr = pPr.find(qn("w:pBdr"))
+    assert pBdr is not None
+
+
+def test_p2_blocks_in_registry():
+    registry = create_default_registry()
+    assert "appendix_table" in registry._renderers
+    assert "checklist" in registry._renderers
+    assert "horizontal_rule" in registry._renderers
