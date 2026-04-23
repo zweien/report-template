@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from docxtpl import DocxTemplate
 
+from report_engine.blocks import create_default_registry
 from report_engine.compat import normalize_payload
 from report_engine.schema import Payload
+from report_engine.style_checker import ensure_template_styles
 from report_engine.subdoc import build_subdoc
+from report_engine.template_checker import ensure_template_contract
 from report_engine.validator import validate_payload
 
 
@@ -76,36 +79,41 @@ def _build_bundle_attachments_context(
         context[bundle.placeholder] = ""
         return
 
+    registry = create_default_registry()
     bundle_subdoc = tpl.new_subdoc()
     include_attachment_title = bool(bundle.include_attachment_title)
 
     for idx, attachment in enumerate(enabled_attachments):
         if idx > 0 and bundle.page_break_between_attachments:
-            page_break_subdoc = build_subdoc(tpl, [{"type": "page_break"}], style_map)
-            for paragraph in page_break_subdoc.paragraphs:
-                # keep behavior simple by rebuilding the page break inside bundle_subdoc
-                _ = paragraph
-            from report_engine.blocks import create_default_registry
+            registry.render(bundle_subdoc, {"type": "page_break"}, style_map)
 
-            create_default_registry().render(bundle_subdoc, {"type": "page_break"}, style_map)
+        if include_attachment_title and attachment.title:
+            registry.render(
+                bundle_subdoc,
+                {"type": "heading", "text": attachment.title, "level": attachment.title_level},
+                style_map,
+            )
 
-        title = attachment.title if include_attachment_title else None
-        attachment_subdoc = build_subdoc(
-            tpl,
-            [block.model_dump() for block in attachment.blocks],
-            style_map,
-            title=title,
-            title_level=attachment.title_level,
-        )
-        for element in attachment_subdoc._element.body:
-            bundle_subdoc._element.body.append(element)
+        for block in attachment.blocks:
+            registry.render(bundle_subdoc, block.model_dump(), style_map)
 
     context[bundle.placeholder] = bundle_subdoc
 
 
-def render_report(template_path: str, output_path: str, payload: Dict[str, Any], *, strict_images: bool = False) -> List[str]:
+def render_report(
+    template_path: str,
+    output_path: str,
+    payload: Dict[str, Any],
+    *,
+    strict_images: bool = False,
+    check_template: bool = True,
+) -> List[str]:
     normalized = normalize_payload(payload)
     payload_model, warnings = validate_payload(normalized, strict_images=strict_images)
+
+    if check_template:
+        ensure_template_styles(template_path, payload_model.style_map)
+        ensure_template_contract(template_path, payload_model)
 
     tpl = DocxTemplate(template_path)
     context: Dict[str, Any] = dict(payload_model.context)
