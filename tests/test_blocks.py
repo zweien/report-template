@@ -182,3 +182,9 @@ def test_p2_blocks_in_registry():
     assert "appendix_table" in registry._renderers
     assert "checklist" in registry._renderers
     assert "horizontal_rule" in registry._renderers
+
+
+def test_toc_placeholder_block(subdoc, style_map, registry):
+    block = {"type": "toc_placeholder", "title": "目 录"}
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.paragraphs) >= 1

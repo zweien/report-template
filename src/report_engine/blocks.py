@@ -302,6 +302,37 @@ def add_horizontal_rule_block(doc: Any, block: Dict[str, Any], style_map: Dict[s
     pPr.append(pBdr)
 
 
+def add_toc_placeholder_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    title = block.get("title", "目录")
+    title_style = _get_style_name(doc, style_map.get("heading_2", "Heading 2"), "Heading 2")
+    doc.add_paragraph(str(title), style=title_style)
+
+    # 插入 TOC 域代码
+    p = doc.add_paragraph()
+    run = p.add_run()
+    fldChar_begin = OxmlElement("w:fldChar")
+    fldChar_begin.set(qn("w:fldCharType"), "begin")
+    run._element.append(fldChar_begin)
+
+    run2 = p.add_run()
+    instrText = OxmlElement("w:instrText")
+    instrText.set(qn("xml:space"), "preserve")
+    instrText.text = ' TOC \\o "1-3" \\h \\z \\u '
+    run2._element.append(instrText)
+
+    run3 = p.add_run()
+    fldChar_separate = OxmlElement("w:fldChar")
+    fldChar_separate.set(qn("w:fldCharType"), "separate")
+    run3._element.append(fldChar_separate)
+
+    run4 = p.add_run("[请右键更新域以生成目录]")
+
+    run5 = p.add_run()
+    fldChar_end = OxmlElement("w:fldChar")
+    fldChar_end.set(qn("w:fldCharType"), "end")
+    run5._element.append(fldChar_end)
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -318,4 +349,5 @@ def create_default_registry() -> BlockRegistry:
     registry.register("appendix_table", add_appendix_table_block)
     registry.register("checklist", add_checklist_block)
     registry.register("horizontal_rule", add_horizontal_rule_block)
+    registry.register("toc_placeholder", add_toc_placeholder_block)
     return registry
