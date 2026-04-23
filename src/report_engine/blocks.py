@@ -47,7 +47,11 @@ class BlockRegistry:
 
 
 def _get_style_name(doc: Any, preferred: str, fallback: str) -> str:
-    style_names = {style.name for style in doc.styles}
+    try:
+        style_names = {style.name for style in doc.styles}
+    except AttributeError:
+        # doc 可能是 _Cell 等不支持 styles 的对象
+        return fallback
     return preferred if preferred in style_names else fallback
 
 
@@ -411,6 +415,39 @@ def add_formula_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]
         cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 
+def add_columns_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    count = int(block["count"])
+    columns = block["columns"]
+    if len(columns) != count:
+        raise BlockRenderError(f"columns: expected {count} columns, got {len(columns)}")
+
+    table = doc.add_table(rows=1, cols=count)
+    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    # 移除边框
+    tbl = table._tbl
+    tbl_pr = tbl.tblPr if tbl.tblPr is not None else OxmlElement("w:tblPr")
+    borders = OxmlElement("w:tblBorders")
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        element = OxmlElement(f"w:{edge}")
+        element.set(qn("w:val"), "none")
+        element.set(qn("w:sz"), "0")
+        element.set(qn("w:space"), "0")
+        element.set(qn("w:color"), "auto")
+        borders.append(element)
+    tbl_pr.append(borders)
+
+    registry = create_default_registry()
+
+    for i, col_blocks in enumerate(columns):
+        cell = table.cell(0, i)
+        cell.text = ""
+        for b in col_blocks:
+            registry.render(cell, b, style_map)
+
+    body_style = _get_style_name(doc, style_map["body"], "Normal")
+    doc.add_paragraph("", style=body_style)
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -430,4 +467,5 @@ def create_default_registry() -> BlockRegistry:
     registry.register("toc_placeholder", add_toc_placeholder_block)
     registry.register("code_block", add_code_block_block)
     registry.register("formula", add_formula_block)
+    registry.register("columns", add_columns_block)
     return registry

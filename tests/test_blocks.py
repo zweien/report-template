@@ -206,3 +206,18 @@ def test_formula_block_text_fallback(subdoc, style_map, registry):
     block = {"type": "formula", "latex": "E = mc^2", "caption": "公式1"}
     registry.render(subdoc, block, style_map)
     assert len(subdoc.paragraphs) >= 1
+
+
+def test_columns_block(subdoc, style_map, registry):
+    block = {
+        "type": "columns",
+        "count": 2,
+        "columns": [
+            [{"type": "paragraph", "text": "左列"}],
+            [{"type": "paragraph", "text": "右列"}],
+        ],
+    }
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.tables) == 1
+    table = subdoc.tables[0]
+    assert len(table.columns) == 2
