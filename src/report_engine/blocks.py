@@ -23,6 +23,7 @@ DEFAULT_STYLE_MAP = {
     "quote": "Quote",
     "appendix_table": "AppendixTable",
     "checklist": "Checklist",
+    "code_block": "CodeBlock",
 }
 
 
@@ -333,6 +334,37 @@ def add_toc_placeholder_block(doc: Any, block: Dict[str, Any], style_map: Dict[s
     run5._element.append(fldChar_end)
 
 
+def add_code_block_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    code = str(block["code"])
+    lines = code.split("\n")
+    style_name = _get_style_name(doc, style_map.get("code_block", "CodeBlock"), style_map["body"])
+
+    for line in lines:
+        p = doc.add_paragraph(style=style_name)
+        run = p.add_run(line)
+        run.font.name = "Courier New"
+        run.font.size = Cm(0.28)  # ~8pt
+        # 灰色底纹
+        rPr = run._element.get_or_add_rPr()
+        shd = OxmlElement("w:shd")
+        shd.set(qn("w:val"), "clear")
+        shd.set(qn("w:color"), "auto")
+        shd.set(qn("w:fill"), "F2F2F2")
+        rPr.append(shd)
+
+    # 语言标注（可选）
+    if block.get("language"):
+        lang_style = _get_style_name(doc, style_map["body"], "Normal")
+        lp = doc.add_paragraph(style=lang_style)
+        lp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        lr = lp.add_run(str(block["language"]))
+        lr.font.size = Cm(0.21)  # ~6pt
+        rPr = lr._element.get_or_add_rPr()
+        color = OxmlElement("w:color")
+        color.set(qn("w:val"), "808080")
+        rPr.append(color)
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -350,4 +382,5 @@ def create_default_registry() -> BlockRegistry:
     registry.register("checklist", add_checklist_block)
     registry.register("horizontal_rule", add_horizontal_rule_block)
     registry.register("toc_placeholder", add_toc_placeholder_block)
+    registry.register("code_block", add_code_block_block)
     return registry

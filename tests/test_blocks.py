@@ -188,3 +188,15 @@ def test_toc_placeholder_block(subdoc, style_map, registry):
     block = {"type": "toc_placeholder", "title": "目 录"}
     registry.render(subdoc, block, style_map)
     assert len(subdoc.paragraphs) >= 1
+
+
+def test_code_block_single_line(subdoc, style_map, registry):
+    block = {"type": "code_block", "code": "print('hello')", "language": "python"}
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.paragraphs) >= 1
+
+
+def test_code_block_multiline(subdoc, style_map, registry):
+    block = {"type": "code_block", "code": "def foo():\n    return 1\n\nfoo()"}
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.paragraphs) == 4
