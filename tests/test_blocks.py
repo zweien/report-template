@@ -115,3 +115,17 @@ def test_quote_block_without_source(subdoc, style_map, registry):
     block = {"type": "quote", "text": "引用文本。"}
     registry.render(subdoc, block, style_map)
     assert len(subdoc.paragraphs) == 1
+
+def test_two_images_row_block(subdoc, style_map, registry):
+    block = {
+        "type": "two_images_row",
+        "images": [
+            {"path": "missing_left.png", "width_cm": 7, "caption": "图1a"},
+            {"path": "missing_right.png", "width_cm": 7, "caption": "图1b"},
+        ],
+    }
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.tables) == 1
+    table = subdoc.tables[0]
+    assert len(table.columns) == 2
+    assert len(table.rows) == 1
