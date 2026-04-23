@@ -1,5 +1,9 @@
 # 通用报告模板引擎 Implementation Plan（修订版）
 
+状态：**Phase 1 唯一实施基准**  
+配套设计文档：`docs/superpowers/specs/2026-04-23-report-engine-design.md`  
+当前行为基线说明：`docs/grant_render_advanced_readme.md`
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 ## 0. 修订结论
