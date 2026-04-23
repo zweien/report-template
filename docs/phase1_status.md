@@ -4,17 +4,9 @@
 
 ## 当前结论
 
-Phase 1 已经从“原型整理”推进到“基础骨架可用”状态。
+Phase 1 已完成，Phase 1.5（Block 扩展）也已全部落地。
 
-当前已经确认：
-
-- advanced 模板已完成适配
-- `check-template` 可通过
-- `render` 可通过
-- `pytest` 已通过
-- 模板文件已提交
-
-这意味着当前仓库已经具备继续稳定迭代的基础。
+当前状态：**18 种 block 类型全部实现，50 个测试通过，端到端渲染可用。**
 
 ## 已完成内容
 
@@ -27,22 +19,32 @@ Phase 1 已经从“原型整理”推进到“基础骨架可用”状态。
 
 ### 核心能力
 
-- payload schema
+- payload schema（Pydantic）
 - compat 归一化
-- validator
-- block registry
+- validator（含 18 种 block 字段校验）
+- block registry（18 种 renderer）
 - subdoc builder
 - renderer
 - style checker
 - template checker
 
+### Block 类型（18 种）
+
+| 批次 | 类型 |
+|------|------|
+| 原有（7 种） | heading、paragraph、bullet_list、numbered_list、table、image、page_break |
+| P1（4 种） | rich_paragraph、note、quote、two_images_row |
+| P2（3 种） | appendix_table、checklist、horizontal_rule |
+| P3（4 种） | toc_placeholder、code_block、formula、columns |
+
 ### 配套资源
 
-- `data/examples/` 示例 payload
-- `tests/` 第一批测试骨架
+- `data/examples/` 示例 payload（含全量 block 测试用例）
+- `templates/test_all_blocks.docx` 全量测试模板
+- `tests/` 50 个测试
 - `output/` 占位目录
 - `assets/` 占位目录
-- README 与排查文档
+- README、排查文档、规范文档
 
 ## 当前可执行流程
 
@@ -64,7 +66,13 @@ report-engine check-template --template templates/grant/template.docx --payload 
 report-engine render --template templates/grant/template.docx --payload data/examples/grant_advanced_demo.json --output output/demo.docx
 ```
 
-### 4. 运行测试
+### 4. 全量 block 测试
+
+```bash
+report-engine render --template templates/test_all_blocks.docx --payload data/examples/test_all_blocks.json --output output/test_all_blocks.docx
+```
+
+### 5. 运行测试
 
 ```bash
 pytest
@@ -72,28 +80,26 @@ pytest
 
 ## 当前仍可继续完善的点
 
-虽然当前已经可用，但仍建议在后续迭代中继续补强：
-
+- formula 的 OMML 原生公式支持（当前降级为图片/纯文本）
+- columns 内嵌套 table 的支持
 - 增加更多真实模板样例
-- 增加更多 block 类型
-- 补更正式的 payload / template spec
 - 做更严格的运行级回归测试
 - 细化错误提示与日志信息
 - 规划 Phase 2 的 Agent Skill 封装
 
 ## 建议的下一阶段顺序
 
-1. 固化默认模板 `templates/grant/template.docx`
-2. 增加至少 1 份额外真实模板样例
-3. 补充 block 扩展设计
-4. 输出正式的 payload / template 规范文档
-5. 再进入 Agent Skill 封装设计
+1. 增加至少 1 份额外真实模板样例
+2. 推进 formula 的 OMML 原生支持
+3. 进入 Phase 2 的 Agent Skill 封装设计
 
 ## 说明
 
 本文件不是实施计划本身，而是当前阶段的状态快照。
 
-实施与设计仍以以下文档为准：
+实施与设计以以下文档为准：
 
-- `docs/superpowers/plans/2026-04-23-report-engine-revised.md`
-- `docs/superpowers/specs/2026-04-23-report-engine-design.md`
+- `docs/superpowers/plans/2026-04-23-report-engine-revised.md`（Phase 1 实施计划）
+- `docs/superpowers/specs/2026-04-23-report-engine-design.md`（Phase 1 设计）
+- `docs/superpowers/specs/2026-04-23-block-extensions-design.md`（Block 扩展设计）
+- `docs/superpowers/plans/2026-04-23-block-extensions-plan.md`（Block 扩展实施计划）

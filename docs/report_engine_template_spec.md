@@ -211,20 +211,44 @@ Phase 1 当前的 checker 已兼容这种策略：
 
 模板建议至少预置以下样式，并最好在模板里真实使用过一次。
 
-### 段落样式
+### 段落样式（10 种）
 
-- `Heading 2`
-- `Heading 3`
-- `Body Text`
-- `Caption`
-- `Legend`
-- `Figure Paragraph`
-- `List Bullet`
-- `List Number`
+| 样式名 | 用途 | 使用的 block 类型 |
+|--------|------|-------------------|
+| `Heading 2` | 二级标题 | `heading`（level ≤ 2） |
+| `Heading 3` | 三级标题 | `heading`（level > 2） |
+| `Body Text` | 正文 | `paragraph`、`rich_paragraph` 及各类 fallback |
+| `Caption` | 图表标题 | `table`、`image`、`formula` 的 title/caption |
+| `Legend` | 图例说明 | `image` 的 legend |
+| `Figure Paragraph` | 图片段落 | `image`、`two_images_row` |
+| `List Bullet` | 无序列表 | `bullet_list` |
+| `List Number` | 有序列表 | `numbered_list` |
+| `Note` | 注释 | `note` |
+| `Quote` | 引用 | `quote` |
 
-### 表格样式
+### 表格样式（2 种）
 
-- `ResearchTable`
+| 样式名 | 用途 | 使用的 block 类型 |
+|--------|------|-------------------|
+| `ResearchTable` | 研究表格（默认） | `table` |
+| `AppendixTable` | 附录表格（可选） | `appendix_table`（fallback 到 ResearchTable） |
+
+### 其他样式（2 种，可选）
+
+| 样式名 | 用途 | 使用的 block 类型 |
+|--------|------|-------------------|
+| `Checklist` | 清单 | `checklist`（fallback 到 List Bullet） |
+| `CodeBlock` | 代码块 | `code_block` |
+
+### 样式 fallback 链
+
+如果模板中缺少某个样式，renderer 会按以下顺序降级：
+
+```
+指定样式 → DEFAULT_STYLE_MAP 中的默认值 → "Normal"
+```
+
+因此即使模板只预置了基础样式（Heading 2/3、Body Text、Caption），渲染也不会失败，只是视觉效果会降级。
 
 ---
 
@@ -288,9 +312,14 @@ Phase 1 当前的 checker 已兼容这种策略：
 ## 11. 推荐验证流程
 
 ```bash
+# 日常验证
 report-engine validate --payload data/examples/grant_advanced_demo.json
 report-engine check-template --template templates/grant/template.docx --payload data/examples/grant_advanced_demo.json
 report-engine render --template templates/grant/template.docx --payload data/examples/grant_advanced_demo.json --output output/demo.docx
+
+# 全量 block 类型测试（18 种）
+report-engine validate --payload data/examples/test_all_blocks.json
+report-engine render --template templates/test_all_blocks.docx --payload data/examples/test_all_blocks.json --output output/test_all_blocks.docx
 ```
 
 ---
