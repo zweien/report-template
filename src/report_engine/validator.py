@@ -24,6 +24,11 @@ BLOCK_REQUIRED_FIELDS = {
     "appendix_table": ["headers", "rows"],
     "checklist": ["items"],
     "horizontal_rule": [],
+    # P3
+    "toc_placeholder": [],
+    "code_block": ["code"],
+    "formula": ["latex"],
+    "columns": ["count", "columns"],
 }
 
 
