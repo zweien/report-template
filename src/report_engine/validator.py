@@ -20,6 +20,10 @@ BLOCK_REQUIRED_FIELDS = {
     "note": ["text"],
     "quote": ["text"],
     "two_images_row": ["images"],
+    # P2
+    "appendix_table": ["headers", "rows"],
+    "checklist": ["items"],
+    "horizontal_rule": [],
 }
 
 
