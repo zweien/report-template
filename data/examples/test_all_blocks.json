@@ -1,0 +1,293 @@
+{
+  "context": {
+    "PROJECT_NAME": "全 Block 类型测试报告",
+    "APPLICANT_ORG": "测试研究院",
+    "PROJECT_LEADER": "测试员",
+    "PROJECT_PERIOD": "2026年1月—2026年12月"
+  },
+  "sections": [
+    {
+      "id": "toc",
+      "placeholder": "TOC_SUBDOC",
+      "flag_name": "ENABLE_TOC",
+      "enabled": true,
+      "blocks": [
+        {
+          "type": "toc_placeholder",
+          "title": "目 录"
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "research_content",
+      "placeholder": "RESEARCH_CONTENT_SUBDOC",
+      "flag_name": "ENABLE_RESEARCH_CONTENT",
+      "enabled": true,
+      "subdoc_title": "一、研究内容与技术路线",
+      "subdoc_title_level": 2,
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "1.1 研究目标",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "本项目旨在构建一个通用报告模板引擎，支持多种 block 类型的结构化渲染。"
+        },
+        {
+          "type": "rich_paragraph",
+          "segments": [
+            {"text": "核心研究方向为"},
+            {"text": "人工智能", "bold": true},
+            {"text": "与"},
+            {"text": "自然语言处理", "italic": true},
+            {"text": "的交叉领域，重点关注 H"},
+            {"text": "2", "sub": true},
+            {"text": "O 等化学式在教育文本中的自动识别。"}
+          ]
+        },
+        {
+          "type": "horizontal_rule"
+        },
+        {
+          "type": "heading",
+          "text": "1.2 技术路线",
+          "level": 2
+        },
+        {
+          "type": "numbered_list",
+          "items": [
+            "需求分析与数据收集",
+            "模型设计与架构搭建",
+            "训练与调优",
+            "部署与验证"
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "1.3 关键技术指标",
+          "level": 3
+        },
+        {
+          "type": "table",
+          "title": "表1：关键技术指标",
+          "headers": ["指标名称", "目标值", "当前值"],
+          "rows": [
+            ["准确率", "≥95%", "92%"],
+            ["召回率", "≥90%", "88%"],
+            ["F1 值", "≥92%", "90%"]
+          ],
+          "force_borders": true
+        },
+        {
+          "type": "note",
+          "text": "以上指标为阶段性测试结果，最终数据以结题报告为准。"
+        },
+        {
+          "type": "quote",
+          "text": "教育是国之大计、党之大计。",
+          "source": "《中国教育现代化2035》"
+        },
+        {
+          "type": "page_break"
+        },
+        {
+          "type": "heading",
+          "text": "1.4 团队分工",
+          "level": 2
+        },
+        {
+          "type": "checklist",
+          "items": [
+            {"text": "完成文献综述", "checked": true},
+            {"text": "完成实验设计", "checked": true},
+            {"text": "提交伦理审查", "checked": false},
+            {"text": "完成数据采集", "checked": false}
+          ]
+        },
+        {
+          "type": "image",
+          "path": "figures/placeholder.png",
+          "width_cm": 10,
+          "caption": "图2：项目总体架构图",
+          "legend": "注：此图为示意，最终以实际设计为准。"
+        }
+      ],
+      "order": 1
+    },
+    {
+      "id": "research_basis",
+      "placeholder": "RESEARCH_BASIS_SUBDOC",
+      "flag_name": "ENABLE_RESEARCH_BASIS",
+      "enabled": true,
+      "subdoc_title": "二、研究基础与条件保障",
+      "subdoc_title_level": 2,
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "2.1 研究团队",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "本课题组由 5 名核心成员组成，涵盖计算机科学、教育学、统计学等学科背景。"
+        },
+        {
+          "type": "heading",
+          "text": "2.2 已有成果",
+          "level": 2
+        },
+        {
+          "type": "bullet_list",
+          "items": [
+            "发表 SCI 论文 3 篇",
+            "授权发明专利 2 项",
+            "完成省级课题 1 项"
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "2.3 设备条件",
+          "level": 2
+        },
+        {
+          "type": "two_images_row",
+          "images": [
+            {"path": "figures/lab_a.png", "width_cm": 7, "caption": "图1a：实验室A"},
+            {"path": "figures/lab_b.png", "width_cm": 7, "caption": "图1b：实验室B"}
+          ]
+        },
+        {
+          "type": "columns",
+          "count": 2,
+          "columns": [
+            [
+              {"type": "heading", "text": "左侧：硬件条件", "level": 3},
+              {"type": "paragraph", "text": "GPU 服务器 4 台，存储容量 100TB。"}
+            ],
+            [
+              {"type": "heading", "text": "右侧：软件条件", "level": 3},
+              {"type": "paragraph", "text": "自研标注平台，支持多人协作。"}
+            ]
+          ]
+        }
+      ],
+      "order": 2
+    },
+    {
+      "id": "implementation_plan",
+      "placeholder": "IMPLEMENTATION_PLAN_SUBDOC",
+      "flag_name": "ENABLE_IMPLEMENTATION_PLAN",
+      "enabled": true,
+      "subdoc_title": "三、实施计划与进度安排",
+      "subdoc_title_level": 2,
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "3.1 进度安排",
+          "level": 2
+        },
+        {
+          "type": "table",
+          "title": "表2：项目进度安排",
+          "headers": ["阶段", "时间", "任务", "交付物"],
+          "rows": [
+            ["第一阶段", "2026.01-03", "需求分析", "需求规格说明书"],
+            ["第二阶段", "2026.04-06", "模型开发", "原型系统"],
+            ["第三阶段", "2026.07-09", "测试优化", "测试报告"],
+            ["第四阶段", "2026.10-12", "部署验收", "结题报告"]
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "3.2 核心算法",
+          "level": 2
+        },
+        {
+          "type": "code_block",
+          "code": "def train_model(data, epochs=10):\n    model = build_model()\n    for epoch in range(epochs):\n        loss = model.train_step(data)\n        print(f\"Epoch {epoch}: loss={loss:.4f}\")\n    return model",
+          "language": "python"
+        },
+        {
+          "type": "formula",
+          "latex": "L = -\\sum_{i=1}^{N} y_i \\log(\\hat{y}_i)",
+          "caption": "公式1：交叉熵损失函数"
+        }
+      ],
+      "order": 3
+    }
+  ],
+  "attachments": [
+    {
+      "id": "appendix_1",
+      "placeholder": "APPENDIX_1_SUBDOC",
+      "flag_name": "ENABLE_APPENDIX_1",
+      "enabled": true,
+      "title": "附件1：经费预算",
+      "title_level": 2,
+      "blocks": [
+        {
+          "type": "appendix_table",
+          "title": "附表1：经费预算明细",
+          "headers": ["科目", "金额（万元）", "说明"],
+          "rows": [
+            ["设备费", "50", "GPU 服务器"],
+            ["材料费", "10", "数据采购"],
+            ["差旅费", "5", "学术交流"],
+            ["合计", "65", ""]
+          ]
+        },
+        {
+          "type": "note",
+          "text": "经费预算为上限，实际支出以审计为准。"
+        }
+      ],
+      "order": 1
+    },
+    {
+      "id": "appendix_2",
+      "placeholder": "APPENDIX_2_SUBDOC",
+      "flag_name": "ENABLE_APPENDIX_2",
+      "enabled": true,
+      "title": "附件2：参考文献",
+      "title_level": 2,
+      "blocks": [
+        {
+          "type": "numbered_list",
+          "items": [
+            "张三. 人工智能教育应用研究[J]. 教育研究, 2025.",
+            "Li et al. NLP for Education[J]. ACL, 2024.",
+            "教育部. 中国教育现代化2035[Z]. 2019."
+          ]
+        },
+        {
+          "type": "horizontal_rule"
+        },
+        {
+          "type": "paragraph",
+          "text": "（附件完）"
+        }
+      ],
+      "order": 2
+    }
+  ],
+  "attachments_bundle": {
+    "enabled": true,
+    "placeholder": "APPENDICES_SUBDOC",
+    "flag_name": "ENABLE_APPENDICES",
+    "page_break_between_attachments": true,
+    "include_attachment_title": true
+  },
+  "style_map": {
+    "table": "ResearchTable",
+    "appendix_table": "AppendixTable",
+    "figure_paragraph": "Figure Paragraph",
+    "legend": "Legend",
+    "note": "Note",
+    "quote": "Quote",
+    "checklist": "Checklist",
+    "code_block": "CodeBlock"
+  }
+}
