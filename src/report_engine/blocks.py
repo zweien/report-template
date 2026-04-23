@@ -181,6 +181,57 @@ def add_quote_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) 
         sp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
 
+
+def add_two_images_row_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    images = block["images"]
+    if len(images) != 2:
+        raise BlockRenderError(f"two_images_row requires exactly 2 images, got {len(images)}")
+
+    table = doc.add_table(rows=1, cols=2)
+    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    # 移除边框
+    tbl = table._tbl
+    tbl_pr = tbl.tblPr if tbl.tblPr is not None else OxmlElement("w:tblPr")
+    borders = OxmlElement("w:tblBorders")
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        element = OxmlElement(f"w:{edge}")
+        element.set(qn("w:val"), "none")
+        element.set(qn("w:sz"), "0")
+        element.set(qn("w:space"), "0")
+        element.set(qn("w:color"), "auto")
+        borders.append(element)
+    tbl_pr.append(borders)
+
+    figure_style = _get_style_name(doc, style_map["figure_paragraph"], style_map["body"])
+    caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+
+    for i, img in enumerate(images):
+        cell = table.cell(0, i)
+        cell.text = ""
+        p = cell.paragraphs[0]
+        p.style = doc.styles[figure_style] if figure_style in [s.name for s in doc.styles] else doc.styles[style_map["body"]]
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        image_path = Path(img["path"])
+        if image_path.exists():
+            run = p.add_run()
+            width_cm = img.get("width_cm")
+            if width_cm is not None:
+                run.add_picture(str(image_path), width=Cm(float(width_cm)))
+            else:
+                run.add_picture(str(image_path))
+        else:
+            p.add_run(f"[图片缺失：{image_path}]")
+
+        if img.get("caption"):
+            cp = cell.add_paragraph(str(img["caption"]))
+            cp.style = doc.styles[caption_style] if caption_style in [s.name for s in doc.styles] else doc.styles[style_map["body"]]
+            cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    body_style = _get_style_name(doc, style_map["body"], "Normal")
+    doc.add_paragraph("", style=body_style)
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -232,6 +283,57 @@ def add_quote_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) 
         sp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
 
+
+def add_two_images_row_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    images = block["images"]
+    if len(images) != 2:
+        raise BlockRenderError(f"two_images_row requires exactly 2 images, got {len(images)}")
+
+    table = doc.add_table(rows=1, cols=2)
+    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    # 移除边框
+    tbl = table._tbl
+    tbl_pr = tbl.tblPr if tbl.tblPr is not None else OxmlElement("w:tblPr")
+    borders = OxmlElement("w:tblBorders")
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        element = OxmlElement(f"w:{edge}")
+        element.set(qn("w:val"), "none")
+        element.set(qn("w:sz"), "0")
+        element.set(qn("w:space"), "0")
+        element.set(qn("w:color"), "auto")
+        borders.append(element)
+    tbl_pr.append(borders)
+
+    figure_style = _get_style_name(doc, style_map["figure_paragraph"], style_map["body"])
+    caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+
+    for i, img in enumerate(images):
+        cell = table.cell(0, i)
+        cell.text = ""
+        p = cell.paragraphs[0]
+        p.style = doc.styles[figure_style] if figure_style in [s.name for s in doc.styles] else doc.styles[style_map["body"]]
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        image_path = Path(img["path"])
+        if image_path.exists():
+            run = p.add_run()
+            width_cm = img.get("width_cm")
+            if width_cm is not None:
+                run.add_picture(str(image_path), width=Cm(float(width_cm)))
+            else:
+                run.add_picture(str(image_path))
+        else:
+            p.add_run(f"[图片缺失：{image_path}]")
+
+        if img.get("caption"):
+            cp = cell.add_paragraph(str(img["caption"]))
+            cp.style = doc.styles[caption_style] if caption_style in [s.name for s in doc.styles] else doc.styles[style_map["body"]]
+            cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    body_style = _get_style_name(doc, style_map["body"], "Normal")
+    doc.add_paragraph("", style=body_style)
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -244,4 +346,5 @@ def create_default_registry() -> BlockRegistry:
     registry.register("rich_paragraph", add_rich_paragraph_block)
     registry.register("note", add_note_block)
     registry.register("quote", add_quote_block)
+    registry.register("two_images_row", add_two_images_row_block)
     return registry
