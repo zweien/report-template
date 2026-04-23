@@ -1,0 +1,116 @@
+{
+  "context": {
+    "PROJECT_NAME": "AI教育应用研究报告",
+    "APPLICANT_ORG": "（请填写）",
+    "PROJECT_LEADER": "（请填写）",
+    "PROJECT_PERIOD": "（请填写）"
+  },
+  "sections": [
+    {
+      "id": "toc",
+      "placeholder": "TOC_SUBDOC",
+      "flag_name": "ENABLE_TOC",
+      "enabled": true,
+      "blocks": [
+        {
+          "type": "toc_placeholder",
+          "title": "目 录"
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "section_1",
+      "placeholder": "SECTION_1_SUBDOC",
+      "flag_name": "ENABLE_SECTION_1",
+      "enabled": true,
+      "subdoc_title": "研究背景与目标",
+      "subdoc_title_level": 2,
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "（请填写小节标题）",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "（请填写正文内容）"
+        }
+      ],
+      "order": 1
+    },
+    {
+      "id": "section_2",
+      "placeholder": "SECTION_2_SUBDOC",
+      "flag_name": "ENABLE_SECTION_2",
+      "enabled": true,
+      "subdoc_title": "技术方案",
+      "subdoc_title_level": 2,
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "（请填写小节标题）",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "（请填写正文内容）"
+        }
+      ],
+      "order": 2
+    },
+    {
+      "id": "section_3",
+      "placeholder": "SECTION_3_SUBDOC",
+      "flag_name": "ENABLE_SECTION_3",
+      "enabled": true,
+      "subdoc_title": "实验结果与分析",
+      "subdoc_title_level": 2,
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "（请填写小节标题）",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "（请填写正文内容）"
+        }
+      ],
+      "order": 3
+    },
+    {
+      "id": "section_4",
+      "placeholder": "SECTION_4_SUBDOC",
+      "flag_name": "ENABLE_SECTION_4",
+      "enabled": true,
+      "subdoc_title": "结论与展望",
+      "subdoc_title_level": 2,
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "（请填写小节标题）",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "（请填写正文内容）"
+        }
+      ],
+      "order": 4
+    }
+  ],
+  "attachments": [],
+  "attachments_bundle": {
+    "enabled": true,
+    "placeholder": "APPENDICES_SUBDOC",
+    "flag_name": "ENABLE_APPENDICES",
+    "page_break_between_attachments": true,
+    "include_attachment_title": true
+  },
+  "style_map": {
+    "table": "ResearchTable",
+    "figure_paragraph": "Figure Paragraph",
+    "legend": "Legend"
+  }
+}
