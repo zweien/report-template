@@ -96,10 +96,13 @@ report-template/
 │   ├── grant_render_readme.md
 │   ├── grant_render_advanced_readme.md
 │   ├── grant_template_upgrade_guide.md
+│   ├── template_check_troubleshooting.md
 │   └── superpowers/
 │       ├── plans/
 │       └── specs/
 ├── tests/
+├── templates/
+│   └── grant/
 ├── output/
 ├── assets/
 ├── pyproject.toml
@@ -217,6 +220,27 @@ pytest
 
 - `docs/grant_template_upgrade_guide.md`
 - `docs/grant_render_advanced_readme.md`
+- `docs/template_check_troubleshooting.md`
+
+### 重要说明
+
+不要把**基础版模板**直接拿去校验 **advanced payload**。
+
+如果你的模板只支持：
+
+- 单个 `RESEARCH_CONTENT_SUBDOC`
+- 没有 `RESEARCH_BASIS_SUBDOC`
+- 没有 `IMPLEMENTATION_PLAN_SUBDOC`
+- 没有 `APPENDICES_SUBDOC`
+- 没有对应 `ENABLE_XXX` 条件开关
+
+那么对它运行：
+
+```bash
+report-engine check-template --payload data/examples/grant_advanced_demo.json
+```
+
+出现 missing placeholders / missing flags / missing styles，通常是**预期结果**，表示模板还没有升级到 advanced 结构。
 
 ---
 
@@ -231,6 +255,8 @@ pytest
 - `data/grant_payload_demo.json`
 - `data/examples/grant_demo.json`
 
+适合搭配只含单个 `RESEARCH_CONTENT_SUBDOC` 的基础模板。
+
 ### 进阶版
 
 用于多章节、多个附件、附件总区、章节开关等场景：
@@ -238,7 +264,9 @@ pytest
 - `data/grant_payload_advanced_demo.json`
 - `data/examples/grant_advanced_demo.json`
 
-推荐优先使用 `data/examples/grant_advanced_demo.json` 进行开发与验证。
+适合搭配已经升级为 advanced 结构的模板。
+
+推荐优先使用 `data/examples/grant_advanced_demo.json` 进行开发与验证，但前提是模板本身也已经完成 advanced 适配。
 
 ---
 
@@ -275,6 +303,7 @@ pytest
 ### 模板改造参考
 
 - `docs/grant_template_upgrade_guide.md`
+- `docs/template_check_troubleshooting.md`
 
 ### 基础版示例（参考）
 
