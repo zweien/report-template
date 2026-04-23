@@ -170,3 +170,36 @@ def create_default_registry() -> BlockRegistry:
     registry.register("image", add_image_block)
     registry.register("page_break", add_page_break_block)
     return registry
+
+def add_rich_paragraph_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    style_name = _get_style_name(doc, style_map["body"], "Normal")
+    p = doc.add_paragraph(style=style_name)
+    for seg in block["segments"]:
+        run = p.add_run(str(seg.get("text", "")))
+        if seg.get("bold"):
+            run.bold = True
+        if seg.get("italic"):
+            run.italic = True
+        if seg.get("sub"):
+            rpr = run._element.get_or_add_rPr()
+            vert_align = OxmlElement("w:vertAlign")
+            vert_align.set(qn("w:val"), "subscript")
+            rpr.append(vert_align)
+        if seg.get("sup"):
+            rpr = run._element.get_or_add_rPr()
+            vert_align = OxmlElement("w:vertAlign")
+            vert_align.set(qn("w:val"), "superscript")
+            rpr.append(vert_align)
+
+
+def create_default_registry() -> BlockRegistry:
+    registry = BlockRegistry()
+    registry.register("heading", add_heading_block)
+    registry.register("paragraph", add_paragraph_block)
+    registry.register("bullet_list", add_bullet_list_block)
+    registry.register("numbered_list", add_numbered_list_block)
+    registry.register("table", add_table_block)
+    registry.register("image", add_image_block)
+    registry.register("page_break", add_page_break_block)
+    registry.register("rich_paragraph", add_rich_paragraph_block)
+    return registry
