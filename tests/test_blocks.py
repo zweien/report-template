@@ -89,3 +89,12 @@ def test_rich_paragraph_block(subdoc, style_map, registry):
     assert p.runs[0].text == "普通文本 "
     assert p.runs[1].bold is True
     assert p.runs[2].italic is True
+
+def test_note_block(subdoc, style_map, registry):
+    block = {"type": "note", "text": "本表数据为示意数据。"}
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.paragraphs) == 1
+    p = subdoc.paragraphs[0]
+    assert p.runs[0].text == "注："
+    assert p.runs[0].bold is True
+    assert p.runs[1].text == "本表数据为示意数据。"
