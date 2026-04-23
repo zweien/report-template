@@ -1,0 +1,2 @@
+docxtpl[subdoc]
+python-docx
