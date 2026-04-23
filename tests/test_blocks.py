@@ -200,3 +200,9 @@ def test_code_block_multiline(subdoc, style_map, registry):
     block = {"type": "code_block", "code": "def foo():\n    return 1\n\nfoo()"}
     registry.render(subdoc, block, style_map)
     assert len(subdoc.paragraphs) == 4
+
+
+def test_formula_block_text_fallback(subdoc, style_map, registry):
+    block = {"type": "formula", "latex": "E = mc^2", "caption": "公式1"}
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.paragraphs) >= 1

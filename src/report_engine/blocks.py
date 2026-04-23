@@ -365,6 +365,52 @@ def add_code_block_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, s
         rPr.append(color)
 
 
+def add_formula_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    latex = str(block["latex"])
+
+    # 方案 1: LaTeX → OMML（暂不实现，直接降级）
+    omml_inserted = False
+
+    # 方案 2: LaTeX → 图片（降级）
+    if not omml_inserted:
+        try:
+            import matplotlib
+            matplotlib.use("Agg")
+            import matplotlib.pyplot as plt
+            from io import BytesIO
+
+            fig, ax = plt.subplots(figsize=(0.01, 0.01))
+            ax.axis("off")
+            text = ax.text(0.5, 0.5, f"${latex}$", fontsize=14, ha="center", va="center")
+            buf = BytesIO()
+            fig.savefig(buf, format="png", bbox_inches="tight", dpi=150, transparent=True)
+            plt.close(fig)
+            buf.seek(0)
+
+            style_name = _get_style_name(doc, style_map["body"], "Normal")
+            p = doc.add_paragraph(style=style_name)
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = p.add_run()
+            run.add_picture(buf, width=Cm(8))
+            omml_inserted = True
+        except Exception:
+            pass
+
+    # 方案 3: 纯文本降级
+    if not omml_inserted:
+        style_name = _get_style_name(doc, style_map.get("code_block", "CodeBlock"), style_map["body"])
+        p = doc.add_paragraph(style=style_name)
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = p.add_run(latex)
+        run.font.name = "Courier New"
+
+    # caption（可选）
+    if block.get("caption"):
+        caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+        cp = doc.add_paragraph(str(block["caption"]), style=caption_style)
+        cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -383,4 +429,5 @@ def create_default_registry() -> BlockRegistry:
     registry.register("horizontal_rule", add_horizontal_rule_block)
     registry.register("toc_placeholder", add_toc_placeholder_block)
     registry.register("code_block", add_code_block_block)
+    registry.register("formula", add_formula_block)
     return registry
