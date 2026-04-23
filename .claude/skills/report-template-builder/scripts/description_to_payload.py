@@ -90,10 +90,15 @@ def parse_description(text: str) -> dict:
 
     # 模式4：逗号/顿号分隔的列表（如果没有找到带序号的章节）
     if not sections:
-        # 去掉已识别的关键词后，按分隔符拆分
-        cleaned = re.sub(r"目录|附件|附录|封面|项目申报书|报告", "", text)
+        # 去掉已识别的关键词和常见填充词
+        cleaned = re.sub(r"目录|附件|附录|封面|项目申报书|报告|开题|结题|中期", "", text)
+        cleaned = re.sub(r"包含|包括|需要|设有|以及|和|与|，|。", ",", cleaned)
+        # 去掉冒号前的引导文字
+        cleaned = re.sub(r"^[^：:]+[：:]\s*", "", cleaned)
         parts = re.split(r"[,，、；;\n]+", cleaned)
-        sections = [p.strip() for p in parts if len(p.strip()) >= 2]
+        # 过滤掉太短的、明显是填充词的
+        stopwords = {"包含", "包括", "需要", "设有", "以及", "和", "与", "等"}
+        sections = [p.strip() for p in parts if len(p.strip()) >= 2 and p.strip() not in stopwords]
 
     # 去重并保持顺序
     seen = set()

@@ -65,11 +65,17 @@ def extract_structure(input_path: str) -> dict:
     for table in doc.tables:
         tables_count += 1
 
-    # 识别可能的章节结构（基于 Heading 1/2）
+    # 识别章节结构（基于 Heading 2，排除标题和附件）
     sections = []
+    title_keywords = ("项目", "申报", "报告", "申请书", "计划书", "开题", "结题")
     for h in headings:
-        if h["level"] <= 2:
-            sections.append(h["text"])
+        if h["level"] == 2 and h["text"] not in ("附件", "附录", "附件区"):
+            # 跳过看起来像文档标题的 Heading 2
+            if any(kw in h["text"] for kw in title_keywords):
+                continue
+            # 去掉中文数字前缀（如"二、"）
+            title = re.sub(r"^[一二三四五六七八九十]+[、．.]\s*", "", h["text"])
+            sections.append(title)
 
     return {
         "headings": headings,
