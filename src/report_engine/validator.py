@@ -15,6 +15,11 @@ BLOCK_REQUIRED_FIELDS = {
     "table": ["headers", "rows"],
     "image": ["path"],
     "page_break": [],
+    # P1
+    "rich_paragraph": ["segments"],
+    "note": ["text"],
+    "quote": ["text"],
+    "two_images_row": ["images"],
 }
 
 
