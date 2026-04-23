@@ -129,3 +129,10 @@ def test_two_images_row_block(subdoc, style_map, registry):
     table = subdoc.tables[0]
     assert len(table.columns) == 2
     assert len(table.rows) == 1
+
+def test_p1_blocks_in_registry():
+    registry = create_default_registry()
+    assert "rich_paragraph" in registry._renderers
+    assert "note" in registry._renderers
+    assert "quote" in registry._renderers
+    assert "two_images_row" in registry._renderers
