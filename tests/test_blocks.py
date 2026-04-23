@@ -98,3 +98,20 @@ def test_note_block(subdoc, style_map, registry):
     assert p.runs[0].text == "注："
     assert p.runs[0].bold is True
     assert p.runs[1].text == "本表数据为示意数据。"
+
+def test_quote_block_with_source(subdoc, style_map, registry):
+    block = {
+        "type": "quote",
+        "text": "教育是国之大计、党之大计。",
+        "source": "《中国教育现代化2035》",
+    }
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.paragraphs) == 2
+    assert "教育是国之大计" in subdoc.paragraphs[0].text
+    assert "中国教育现代化" in subdoc.paragraphs[1].text
+
+
+def test_quote_block_without_source(subdoc, style_map, registry):
+    block = {"type": "quote", "text": "引用文本。"}
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.paragraphs) == 1
