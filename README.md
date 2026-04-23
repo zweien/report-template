@@ -96,7 +96,10 @@ report-template/
 │   ├── grant_render_readme.md
 │   ├── grant_render_advanced_readme.md
 │   ├── grant_template_upgrade_guide.md
+│   ├── report_engine_payload_spec.md
+│   ├── report_engine_template_spec.md
 │   ├── template_check_troubleshooting.md
+│   ├── phase1_status.md
 │   └── superpowers/
 │       ├── plans/
 │       └── specs/
@@ -220,7 +223,9 @@ pytest
 
 - `docs/grant_template_upgrade_guide.md`
 - `docs/grant_render_advanced_readme.md`
+- `docs/report_engine_template_spec.md`
 - `docs/template_check_troubleshooting.md`
+- `templates/grant/README.md`
 
 ### 重要说明
 
@@ -268,6 +273,10 @@ report-engine check-template --payload data/examples/grant_advanced_demo.json
 
 推荐优先使用 `data/examples/grant_advanced_demo.json` 进行开发与验证，但前提是模板本身也已经完成 advanced 适配。
 
+payload 写法参考：
+
+- `docs/report_engine_payload_spec.md`
+
 ---
 
 ## 10. 兼容入口说明
@@ -300,10 +309,20 @@ report-engine check-template --payload data/examples/grant_advanced_demo.json
 - `scripts/render_grant_advanced.py`
 - `data/grant_payload_advanced_demo.json`
 
+### 正式规范文档
+
+- `docs/report_engine_payload_spec.md`
+- `docs/report_engine_template_spec.md`
+
 ### 模板改造参考
 
 - `docs/grant_template_upgrade_guide.md`
 - `docs/template_check_troubleshooting.md`
+- `templates/grant/README.md`
+
+### 阶段状态
+
+- `docs/phase1_status.md`
 
 ### 基础版示例（参考）
 
