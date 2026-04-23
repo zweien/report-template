@@ -148,14 +148,12 @@ def generate_template(parsed: dict, output_path: str):
         doc.add_page_break()
 
     # 章节
-    chinese_nums = "一二三四五六七八九十"
     section_defs = []
     for i, title in enumerate(parsed["sections"][:10]):
         prefix = f"SECTION_{i + 1}"
-        num = chinese_nums[i] if i < len(chinese_nums) else str(i + 1)
-        section_defs.append((title, prefix, num))
+        section_defs.append((title, prefix))
         doc.add_paragraph(f"{{%p if ENABLE_{prefix} %}}")
-        doc.add_paragraph(f"{num}、{title}")
+        # 不在模板中硬编码标题，由 payload 的 subdoc_title 负责插入
         doc.add_paragraph(f"{{{{p {prefix}_SUBDOC }}}}")
         doc.add_paragraph("{%p endif %}")
 
@@ -197,7 +195,7 @@ def generate_payload(parsed: dict, section_defs: list) -> dict:
         })
         order += 1
 
-    for title, prefix, _ in section_defs:
+    for title, prefix in section_defs:
         sections.append({
             "id": prefix.lower(),
             "placeholder": f"{prefix}_SUBDOC",

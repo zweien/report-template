@@ -100,9 +100,6 @@ def add_toc(doc: Document):
 def add_section(doc: Document, title: str, prefix: str, number: int):
     """添加一个带条件开关的章节。"""
     doc.add_paragraph(f"{{%p if ENABLE_{prefix} %}}")
-    chinese_nums = "一二三四五六七八九十"
-    num_str = chinese_nums[number - 1] if number <= len(chinese_nums) else str(number)
-    doc.add_paragraph(f"{num_str}、{title}")
     doc.add_paragraph(f"{{{{p {prefix}_SUBDOC }}}}")
     doc.add_paragraph("{%p endif %}")
 

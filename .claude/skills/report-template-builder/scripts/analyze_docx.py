@@ -127,15 +127,12 @@ def generate_template_from_structure(structure: dict, output_path: str,
         doc.add_paragraph("{%p endif %}")
         doc.add_page_break()
 
-    # 章节
-    chinese_nums = "一二三四五六七八九十"
+    # 章节（不硬编码标题，由 payload 的 subdoc_title 负责插入）
     section_defs = []
     for i, title in enumerate(structure["sections"][:10]):  # 最多 10 个章节
         prefix = f"SECTION_{i + 1}"
-        num = chinese_nums[i] if i < len(chinese_nums) else str(i + 1)
-        section_defs.append((title, prefix, num))
+        section_defs.append((title, prefix))
         doc.add_paragraph(f"{{%p if ENABLE_{prefix} %}}")
-        doc.add_paragraph(f"{num}、{title}")
         doc.add_paragraph(f"{{{{p {prefix}_SUBDOC }}}}")
         doc.add_paragraph("{%p endif %}")
 
