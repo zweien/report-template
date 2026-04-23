@@ -254,6 +254,241 @@ Phase 1 当前支持以下 block：
 {"type": "page_break"}
 ```
 
+### `rich_paragraph`
+
+带富文本格式的段落，支持行内加粗、斜体、上标、下标。
+
+```json
+{
+  "type": "rich_paragraph",
+  "segments": [
+    {"text": "普通文本"},
+    {"text": "加粗文本", "bold": true},
+    {"text": "斜体文本", "italic": true},
+    {"text": "下标", "sub": true},
+    {"text": "上标", "sup": true}
+  ]
+}
+```
+
+**字段说明：**
+
+- `segments`（必填）：文本片段数组
+  - `text`（必填）：片段文本内容
+  - `bold`（可选）：是否加粗，默认 `false`
+  - `italic`（可选）：是否斜体，默认 `false`
+  - `sub`（可选）：是否为下标，默认 `false`
+  - `sup`（可选）：是否为上标，默认 `false`
+
+---
+
+### `note`
+
+注释块，自动添加"注："前缀并加粗。
+
+```json
+{"type": "note", "text": "注：以上经费为预算上限，实际支出以审计结果为准。"}
+```
+
+**字段说明：**
+
+- `text`（必填）：注释文本内容
+
+---
+
+### `quote`
+
+引用块，用于引用政策文件、领导讲话等。可附带来源信息。
+
+```json
+{
+  "type": "quote",
+  "text": "教育是国之大计、党之大计。",
+  "source": "《中国教育现代化2035》"
+}
+```
+
+**字段说明：**
+
+- `text`（必填）：引用文本内容
+- `source`（可选）：引用来源，渲染为右对齐文本
+
+---
+
+### `two_images_row`
+
+双图并排块，将两张图片以无边框表格形式左右并排放置。
+
+```json
+{
+  "type": "two_images_row",
+  "images": [
+    {
+      "path": "figures/fig1.png",
+      "width_cm": 8,
+      "caption": "图1 左侧图片"
+    },
+    {
+      "path": "figures/fig2.png",
+      "width_cm": 8,
+      "caption": "图2 右侧图片"
+    }
+  ]
+}
+```
+
+**字段说明：**
+
+- `images`（必填）：恰好 2 个图片对象的数组
+  - `path`（必填）：图片文件路径
+  - `width_cm`（可选）：图片宽度（厘米）
+  - `caption`（可选）：图片说明文字
+
+---
+
+### `appendix_table`
+
+附录表格，与 `table` 类型结构相同，但默认使用 `AppendixTable` 样式（适用于附录中的表格）。
+
+```json
+{
+  "type": "appendix_table",
+  "title": "表A-1 附录表格",
+  "headers": ["列1", "列2", "列3"],
+  "rows": [["A", "B", "C"]],
+  "style": "AppendixTable",
+  "force_borders": true
+}
+```
+
+**字段说明：**
+
+- `headers`（必填）：表头字符串数组
+- `rows`（必填）：二维数据数组
+- `title`（可选）：表格标题
+- `style`（可选）：Word 表格样式名，默认 `AppendixTable`
+- `force_borders`（可选）：是否强制边框，默认 `true`
+
+---
+
+### `checklist`
+
+清单/复选框列表，每项带有勾选状态。
+
+```json
+{
+  "type": "checklist",
+  "items": [
+    {"text": "完成文献综述", "checked": true},
+    {"text": "完成实验设计", "checked": true},
+    {"text": "提交伦理审查", "checked": false}
+  ]
+}
+```
+
+**字段说明：**
+
+- `items`（必填）：清单项数组
+  - `text`（必填）：清单项文本
+  - `checked`（可选）：是否已勾选，默认 `false`
+
+---
+
+### `horizontal_rule`
+
+水平分隔线，用于视觉分隔不同内容区域。
+
+```json
+{"type": "horizontal_rule"}
+```
+
+**字段说明：**
+
+- 无额外字段
+
+---
+
+### `toc_placeholder`
+
+目录占位符，插入 TOC 域代码。在 Word 中右键更新域即可生成目录。
+
+```json
+{
+  "type": "toc_placeholder",
+  "title": "目录"
+}
+```
+
+**字段说明：**
+
+- `title`（可选）：目录标题，默认 `"目录"`
+
+---
+
+### `code_block`
+
+代码块，使用等宽字体（Courier New）渲染代码，带有灰色底纹背景。
+
+```json
+{
+  "type": "code_block",
+  "code": "def hello():\n    print('Hello, World!')",
+  "language": "Python"
+}
+```
+
+**字段说明：**
+
+- `code`（必填）：代码文本内容
+- `language`（可选）：语言标注，渲染为右对齐灰色小字
+
+---
+
+### `formula`
+
+数学公式块，优先使用 matplotlib 渲染 LaTeX 公式为图片；若 matplotlib 不可用则降级为纯文本。
+
+```json
+{
+  "type": "formula",
+  "latex": "E = mc^2",
+  "caption": "公式1 爱因斯坦质能方程"
+}
+```
+
+**字段说明：**
+
+- `latex`（必填）：LaTeX 格式的数学公式
+- `caption`（可选）：公式说明文字
+
+---
+
+### `columns`
+
+多栏布局块，将内容分为指定数量的列（使用无边框表格实现）。
+
+```json
+{
+  "type": "columns",
+  "count": 2,
+  "columns": [
+    [
+      {"type": "paragraph", "text": "左栏内容"},
+      {"type": "bullet_list", "items": ["条目1", "条目2"]}
+    ],
+    [
+      {"type": "paragraph", "text": "右栏内容"},
+      {"type": "image", "path": "figures/side.png", "width_cm": 7}
+    ]
+  ]
+}
+```
+
+**字段说明：**
+
+- `count`（必填）：列数，必须与 `columns` 数组长度一致
+- `columns`（必填）：嵌套 block 数组，每个子数组为一列的内容
+
 ---
 
 ## 9. 最小 advanced payload 示例

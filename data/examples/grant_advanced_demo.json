@@ -16,6 +16,11 @@
         {"type": "paragraph", "text": "本项目围绕复杂工程系统设计场景，构建“需求理解—方案生成—仿真验证—结果追溯”的智能生成式设计能力体系。"},
         {"type": "heading", "level": 2, "text": "2. 研究内容"},
         {"type": "paragraph", "text": "研究内容包括需求建模、知识组织、协同编排、仿真验证与证据链归集五个方面。"},
+        {"type": "rich_paragraph", "segments": [
+            {"text": "本项目聚焦"},
+            {"text": "人工智能", "bold": true},
+            {"text": "在基础教育中的应用研究。"}
+        ]},
         {
           "type": "table",
           "title": "表1 研究任务分解",
@@ -26,6 +31,9 @@
             ["任务3", "验证测试与优化迭代", "9—12月", "测试报告"]
           ]
         },
+        {"type": "note", "text": "注：以上经费为预算上限，实际支出以审计结果为准。"},
+        {"type": "quote", "text": "教育是国之大计、党之大计。", "source": "《中国教育现代化2035》"},
+        {"type": "horizontal_rule"},
         {
           "type": "image",
           "path": "figures/tech_route.png",
@@ -42,7 +50,12 @@
       "enabled": true,
       "blocks": [
         {"type": "paragraph", "text": "项目团队前期已完成相关原型系统开发，具备支撑本项目实施的基础。"},
-        {"type": "bullet_list", "items": ["已形成一版需求建模工具链。", "已积累多个真实项目案例数据。", "已具备可复用的图表生成流程。"]}
+        {"type": "bullet_list", "items": ["已形成一版需求建模工具链。", "已积累多个真实项目案例数据。", "已具备可复用的图表生成流程。"]},
+        {"type": "checklist", "items": [
+            {"text": "完成文献综述", "checked": true},
+            {"text": "完成实验设计", "checked": true},
+            {"text": "提交伦理审查", "checked": false}
+        ]}
       ]
     },
     {
