@@ -237,13 +237,19 @@ pytest
 - `ResearchTable`
 - `AppendixTable`（附录表格，可选，fallback 到 ResearchTable）
 
-模板写法参考：
+### 制作模板的文档指引
 
-- `docs/grant_template_upgrade_guide.md`
-- `docs/grant_render_advanced_readme.md`
-- `docs/report_engine_template_spec.md`
-- `docs/template_check_troubleshooting.md`
-- `templates/grant/README.md`
+如果你要从零制作一个新模板，按以下顺序阅读：
+
+1. **`docs/report_engine_template_spec.md`** — 模板规范（必读），包含占位符、条件开关、样式要求、fallback 链
+2. **`docs/report_engine_payload_spec.md`** — payload 规范，了解每种 block 需要什么字段，模板需要配套什么样式
+3. **`scripts/build_test_template.py`** — 模板生成脚本，可作为参考实现
+4. **`templates/grant/README.md`** — 现有模板的约定说明
+
+如果要从现有模板改造：
+
+- **`docs/grant_template_upgrade_guide.md`** — 从基础版升级到 advanced 版的指南
+- **`docs/template_check_troubleshooting.md`** — check-template 报错时的排查手册
 
 ### 重要说明
 
