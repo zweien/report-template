@@ -1,0 +1,102 @@
+{
+  "context": {
+    "PROJECT_NAME": "智能生成式设计关键技术研究项目申报书",
+    "APPLICANT_ORG": "XX研究院",
+    "PROJECT_LEADER": "张三",
+    "PROJECT_PERIOD": "2026年1月—2027年12月"
+  },
+  "sections": [
+    {
+      "id": "research_content",
+      "placeholder": "RESEARCH_CONTENT_SUBDOC",
+      "flag_name": "ENABLE_RESEARCH_CONTENT",
+      "enabled": true,
+      "blocks": [
+        {"type": "heading", "level": 2, "text": "1. 研究目标"},
+        {"type": "paragraph", "text": "本项目围绕复杂工程系统设计场景，构建“需求理解—方案生成—仿真验证—结果追溯”的智能生成式设计能力体系。"},
+        {"type": "heading", "level": 2, "text": "2. 研究内容"},
+        {"type": "paragraph", "text": "研究内容包括需求建模、知识组织、协同编排、仿真验证与证据链归集五个方面。"},
+        {
+          "type": "table",
+          "title": "表1 研究任务分解",
+          "headers": ["任务模块", "主要内容", "阶段安排", "预期产出"],
+          "rows": [
+            ["任务1", "需求分析与指标分解", "1—3月", "需求说明书"],
+            ["任务2", "模型构建与原型实现", "4—8月", "原型系统"],
+            ["任务3", "验证测试与优化迭代", "9—12月", "测试报告"]
+          ]
+        },
+        {
+          "type": "image",
+          "path": "figures/tech_route.png",
+          "width_cm": 14,
+          "caption": "图1 总体技术路线图",
+          "legend": "注：蓝色表示数据流，绿色表示控制流。"
+        }
+      ]
+    },
+    {
+      "id": "research_basis",
+      "placeholder": "RESEARCH_BASIS_SUBDOC",
+      "flag_name": "ENABLE_RESEARCH_BASIS",
+      "enabled": true,
+      "blocks": [
+        {"type": "paragraph", "text": "项目团队前期已完成相关原型系统开发，具备支撑本项目实施的基础。"},
+        {"type": "bullet_list", "items": ["已形成一版需求建模工具链。", "已积累多个真实项目案例数据。", "已具备可复用的图表生成流程。"]}
+      ]
+    },
+    {
+      "id": "implementation_plan",
+      "placeholder": "IMPLEMENTATION_PLAN_SUBDOC",
+      "flag_name": "ENABLE_IMPLEMENTATION_PLAN",
+      "enabled": false,
+      "blocks": [
+        {"type": "paragraph", "text": "这是一个被关闭的可选章节示例。"}
+      ]
+    }
+  ],
+  "attachments": [
+    {
+      "id": "appendix_1",
+      "placeholder": "APPENDIX_1_SUBDOC",
+      "flag_name": "ENABLE_APPENDIX_1",
+      "enabled": true,
+      "title": "附件1：代表性成果目录",
+      "title_level": 2,
+      "blocks": [
+        {
+          "type": "table",
+          "title": "表A-1 代表性成果清单",
+          "headers": ["序号", "成果名称", "类型", "备注"],
+          "rows": [
+            ["1", "智能设计原型系统", "软件", "已完成内部测试"],
+            ["2", "技术路线说明文档", "文档", "可作为申报支撑材料"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appendix_2",
+      "placeholder": "APPENDIX_2_SUBDOC",
+      "flag_name": "ENABLE_APPENDIX_2",
+      "enabled": true,
+      "title": "附件2：支撑材料清单",
+      "title_level": 2,
+      "blocks": [
+        {"type": "numbered_list", "items": ["相关项目结题报告。", "原型系统测试记录。", "代表性成果截图与说明。"]}
+      ]
+    }
+  ],
+  "attachments_bundle": {
+    "enabled": true,
+    "placeholder": "APPENDICES_SUBDOC",
+    "flag_name": "ENABLE_APPENDICES",
+    "page_break_between_attachments": true,
+    "include_attachment_title": true
+  },
+  "style_map": {
+    "table": "ResearchTable",
+    "figure_paragraph": "Figure Paragraph",
+    "legend": "Legend"
+  }
+}
