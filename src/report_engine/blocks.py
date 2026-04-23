@@ -21,6 +21,8 @@ DEFAULT_STYLE_MAP = {
     "numbered_list": "List Number",
     "note": "Note",
     "quote": "Quote",
+    "appendix_table": "AppendixTable",
+    "checklist": "Checklist",
 }
 
 
@@ -250,6 +252,56 @@ def add_two_images_row_block(doc: Any, block: Dict[str, Any], style_map: Dict[st
     doc.add_paragraph("", style=body_style)
 
 
+def add_appendix_table_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    if block.get("title"):
+        caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+        doc.add_paragraph(str(block["title"]), style=caption_style)
+
+    headers = block["headers"]
+    rows = block["rows"]
+    table_style = block.get("style") or style_map.get("appendix_table", style_map["table"])
+    table_style = _get_style_name(doc, table_style, "Table Grid")
+
+    table = doc.add_table(rows=1, cols=len(headers))
+    table.style = table_style
+
+    hdr_cells = table.rows[0].cells
+    for i, header in enumerate(headers):
+        hdr_cells[i].text = "" if header is None else str(header)
+
+    for row in rows:
+        row_cells = table.add_row().cells
+        for i, value in enumerate(row):
+            row_cells[i].text = "" if value is None else str(value)
+
+    if block.get("force_borders", True):
+        _set_table_borders(table)
+
+    body_style = _get_style_name(doc, style_map["body"], "Normal")
+    doc.add_paragraph("", style=body_style)
+
+
+def add_checklist_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    style_name = _get_style_name(doc, style_map.get("checklist", "Checklist"), style_map.get("bullet_list", style_map["body"]))
+    for item in block["items"]:
+        p = doc.add_paragraph(style=style_name)
+        prefix = "☑" if item.get("checked", False) else "☐"
+        p.add_run(f"{prefix} {str(item['text'])}")
+
+
+def add_horizontal_rule_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    p = doc.add_paragraph()
+    pPr = p._element.get_or_add_pPr()
+    pBdr = OxmlElement("w:pBdr")
+    bottom = OxmlElement("w:bottom")
+    bottom.set(qn("w:val"), "single")
+    bottom.set(qn("w:sz"), "6")
+    bottom.set(qn("w:space"), "1")
+    bottom.set(qn("w:color"), "auto")
+    pBdr.append(bottom)
+    pPr.append(pBdr)
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -263,4 +315,7 @@ def create_default_registry() -> BlockRegistry:
     registry.register("note", add_note_block)
     registry.register("quote", add_quote_block)
     registry.register("two_images_row", add_two_images_row_block)
+    registry.register("appendix_table", add_appendix_table_block)
+    registry.register("checklist", add_checklist_block)
+    registry.register("horizontal_rule", add_horizontal_rule_block)
     return registry
