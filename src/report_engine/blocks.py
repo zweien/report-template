@@ -19,6 +19,7 @@ DEFAULT_STYLE_MAP = {
     "table": "ResearchTable",
     "bullet_list": "List Bullet",
     "numbered_list": "List Number",
+    "note": "Note",
 }
 
 
@@ -160,6 +161,15 @@ def add_image_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) 
     doc.add_paragraph("", style=body_style)
 
 
+
+def add_note_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    style_name = _get_style_name(doc, style_map.get("note", "Note"), style_map["body"])
+    p = doc.add_paragraph(style=style_name)
+    prefix_run = p.add_run("注：")
+    prefix_run.bold = True
+    p.add_run(str(block["text"]))
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -192,6 +202,15 @@ def add_rich_paragraph_block(doc: Any, block: Dict[str, Any], style_map: Dict[st
             rpr.append(vert_align)
 
 
+
+def add_note_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    style_name = _get_style_name(doc, style_map.get("note", "Note"), style_map["body"])
+    p = doc.add_paragraph(style=style_name)
+    prefix_run = p.add_run("注：")
+    prefix_run.bold = True
+    p.add_run(str(block["text"]))
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -202,4 +221,5 @@ def create_default_registry() -> BlockRegistry:
     registry.register("image", add_image_block)
     registry.register("page_break", add_page_break_block)
     registry.register("rich_paragraph", add_rich_paragraph_block)
+    registry.register("note", add_note_block)
     return registry
