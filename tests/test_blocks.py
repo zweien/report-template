@@ -221,3 +221,11 @@ def test_columns_block(subdoc, style_map, registry):
     assert len(subdoc.tables) == 1
     table = subdoc.tables[0]
     assert len(table.columns) == 2
+
+
+def test_p3_blocks_in_registry():
+    registry = create_default_registry()
+    assert "toc_placeholder" in registry._renderers
+    assert "code_block" in registry._renderers
+    assert "formula" in registry._renderers
+    assert "columns" in registry._renderers
