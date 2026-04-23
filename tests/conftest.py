@@ -41,6 +41,7 @@ def minimal_template(tmp_path: Path) -> str:
         "Figure Paragraph",
         "List Bullet",
         "List Number",
+        "Note",
     ]
     for name in paragraph_styles:
         try:
