@@ -37,28 +37,45 @@ def check_template_contract(template_path: str, payload: Payload) -> TemplateChe
     warnings: List[str] = []
     notes: List[str] = []
 
+    bundle_enabled = bool(payload.attachments_bundle and payload.attachments_bundle.enabled)
+    bundle_placeholder_present = False
+    bundle_flag_present = False
+
+    if payload.attachments_bundle and payload.attachments_bundle.enabled:
+        bundle = payload.attachments_bundle
+        bundle_placeholder_present = bundle.placeholder in xml
+        bundle_flag_present = (not bundle.flag_name) or (bundle.flag_name in xml)
+        if not bundle_placeholder_present:
+            missing_placeholders.append(bundle.placeholder)
+        if bundle.flag_name and not bundle_flag_present:
+            missing_flags.append(bundle.flag_name)
+
     for section in payload.sections:
-        token = section.placeholder
-        if token not in xml:
-            missing_placeholders.append(token)
+        if section.placeholder not in xml:
+            missing_placeholders.append(section.placeholder)
         if section.flag_name and section.flag_name not in xml:
             missing_flags.append(section.flag_name)
 
     for attachment in payload.attachments:
-        token = attachment.placeholder
-        if token not in xml:
-            missing_placeholders.append(token)
-        if attachment.flag_name and attachment.flag_name not in xml:
-            missing_flags.append(attachment.flag_name)
+        placeholder_present = attachment.placeholder in xml
+        flag_present = (not attachment.flag_name) or (attachment.flag_name in xml)
 
-    if payload.attachments_bundle and payload.attachments_bundle.enabled:
-        bundle = payload.attachments_bundle
-        if bundle.placeholder not in xml:
-            missing_placeholders.append(bundle.placeholder)
-        if bundle.flag_name and bundle.flag_name not in xml:
-            missing_flags.append(bundle.flag_name)
+        if not placeholder_present:
+            if not (bundle_enabled and bundle_placeholder_present):
+                missing_placeholders.append(attachment.placeholder)
+            else:
+                notes.append(
+                    f"Attachment placeholder {attachment.placeholder} omitted; bundled appendix slot will be used instead."
+                )
 
-    # heuristic only: if placeholder exists but matching flag is absent, note likely fixed-title template usage
+        if attachment.flag_name and not flag_present:
+            if not (bundle_enabled and bundle_flag_present):
+                missing_flags.append(attachment.flag_name)
+            else:
+                notes.append(
+                    f"Attachment flag {attachment.flag_name} omitted; bundled appendix flag will be used instead."
+                )
+
     if missing_flags and not missing_placeholders:
         notes.append("Some placeholders exist without matching flags; template may use fixed titles outside condition blocks.")
 
