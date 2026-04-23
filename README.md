@@ -42,15 +42,28 @@
 - examples 示例 payload
 - 第一批测试骨架
 
-当前支持的基础 block 类型：
+当前支持的 block 类型（共 18 种）：
 
-- `heading`
-- `paragraph`
-- `bullet_list`
-- `numbered_list`
-- `table`
-- `image`
-- `page_break`
+| 类型 | 说明 |
+|------|------|
+| `heading` | 标题（支持 level 2/3） |
+| `paragraph` | 普通段落 |
+| `rich_paragraph` | 富文本段落（支持 bold/italic/sub/sup） |
+| `bullet_list` | 无序列表 |
+| `numbered_list` | 有序列表 |
+| `table` | 表格（支持标题、样式、边框） |
+| `image` | 图片（支持宽度、图题、图例） |
+| `page_break` | 分页符 |
+| `note` | 注释块（带"注："前缀） |
+| `quote` | 引用块（支持来源说明） |
+| `two_images_row` | 双图并排 |
+| `appendix_table` | 附录表格 |
+| `checklist` | 清单（☐/☑ 勾选） |
+| `horizontal_rule` | 水平分隔线 |
+| `toc_placeholder` | 目录域占位 |
+| `code_block` | 代码块（等宽字体 + 灰底） |
+| `formula` | 公式（LaTeX 输入，三级降级） |
+| `columns` | 多列布局（嵌套 block） |
 
 ---
 
@@ -214,10 +227,15 @@ pytest
 - `Figure Paragraph`
 - `List Bullet`
 - `List Number`
+- `Note`（注释块）
+- `Quote`（引用块）
+- `CodeBlock`（代码块）
+- `Checklist`（清单）
 
 ### 表格样式
 
 - `ResearchTable`
+- `AppendixTable`（附录表格，可选，fallback 到 ResearchTable）
 
 模板写法参考：
 
@@ -303,6 +321,11 @@ payload 写法参考：
 
 - `docs/superpowers/specs/2026-04-23-report-engine-design.md`
 
+### Block 扩展
+
+- `docs/superpowers/specs/2026-04-23-block-extensions-design.md`（11 种新 block 设计）
+- `docs/superpowers/plans/2026-04-23-block-extensions-plan.md`（实施计划）
+
 ### 当前行为基线
 
 - `docs/grant_render_advanced_readme.md`
@@ -352,12 +375,12 @@ payload 写法参考：
 
 ## 13. 当前限制
 
-当前项目仍处于 Phase 1 中，下面这些内容仍在逐步完善：
+当前项目已从 Phase 1 进入扩展阶段，下面这些内容仍在逐步完善：
 
 - 更严格的运行级回归验证
 - 更多模板适配样例
-- 更多 block 类型
-- 更正式的 payload / template spec 文档
+- formula 的 OMML 原生公式支持（当前降级为图片/纯文本）
+- columns 内嵌套 table 的支持
 - 更完整的错误提示和日志输出
 - Phase 2 的 Agent Skill 封装
 
@@ -371,7 +394,8 @@ payload 写法参考：
 2. 用真实模板跑一次 `check-template`
 3. 用真实模板和 example payload 跑一次 `render`
 4. 根据真实模板差异补充 style / placeholder / flag 约束
-5. 再继续扩展 block 类型或 Agent Skill 封装
+5. 根据需要添加更多模板适配样例
+6. 推进 Phase 2 的 Agent Skill 封装
 
 ---
 
