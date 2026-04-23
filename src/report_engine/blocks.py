@@ -20,6 +20,7 @@ DEFAULT_STYLE_MAP = {
     "bullet_list": "List Bullet",
     "numbered_list": "List Number",
     "note": "Note",
+    "quote": "Quote",
 }
 
 
@@ -170,6 +171,16 @@ def add_note_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -
     p.add_run(str(block["text"]))
 
 
+
+def add_quote_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    quote_style = _get_style_name(doc, style_map.get("quote", "Quote"), style_map["body"])
+    doc.add_paragraph(str(block["text"]), style=quote_style)
+    if block.get("source"):
+        source_style = _get_style_name(doc, style_map["body"], "Normal")
+        sp = doc.add_paragraph(str(block["source"]), style=source_style)
+        sp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -211,6 +222,16 @@ def add_note_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -
     p.add_run(str(block["text"]))
 
 
+
+def add_quote_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    quote_style = _get_style_name(doc, style_map.get("quote", "Quote"), style_map["body"])
+    doc.add_paragraph(str(block["text"]), style=quote_style)
+    if block.get("source"):
+        source_style = _get_style_name(doc, style_map["body"], "Normal")
+        sp = doc.add_paragraph(str(block["source"]), style=source_style)
+        sp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -222,4 +243,5 @@ def create_default_registry() -> BlockRegistry:
     registry.register("page_break", add_page_break_block)
     registry.register("rich_paragraph", add_rich_paragraph_block)
     registry.register("note", add_note_block)
+    registry.register("quote", add_quote_block)
     return registry
