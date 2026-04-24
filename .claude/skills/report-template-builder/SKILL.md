@@ -172,6 +172,123 @@ report-engine render --template templates/generated.docx --payload data/examples
 
 analyze_docx.py 依赖标题样式（Heading 1/2）识别章节。如果原文档没有使用标准标题样式，需要手动调整生成的 payload 中的 sections。
 
+## 模板内格式要求（可选增强）
+
+用户可以在模板草稿中插入格式要求注释，由脚本自动解析并应用到样式，同时去除这些注释段落。
+
+### 语法
+
+在模板段落中写入：
+
+```text
+[[FORMAT: 目标样式: 属性=值, 属性=值, ...]]
+```
+
+或省略目标样式（自动推断）：
+
+```text
+[[FORMAT: 标题字体=黑体, 字号=三号]]
+[[FORMAT: 正文字体=宋体, 字号=小四, 行距=1.5倍]]
+[[FORMAT: 页面: 页边距上=2.54cm, 页边距左=3.17cm]]
+```
+
+### 自然语言描述（新）
+
+也支持用自然语言整段描述格式要求，无需键值对：
+
+```text
+[[FORMAT: 书写正文内容时（除标题以外的内容），字体均为五号宋体；版式采用两端对齐，首行缩进"0.76厘米"，段前"0磅"，段后"0磅"，行距"最小值18磅"]]
+```
+
+脚本会自动从描述中提取格式信息。支持的自然语言模式：
+
+| 模式 | 示例 | 提取结果 |
+|------|------|---------|
+| 字体+字号组合 | "字体均为五号宋体" | 字体=宋体, 字号=五号 |
+| 版式/对齐 | "版式采用两端对齐" | 对齐=两端对齐 |
+| 首行缩进 | "首行缩进0.76厘米" / "首行缩进2字符" | 首行缩进=0.76cm |
+| 段前/段后 | "段前0磅" / "段后12磅" | 段前=0pt, 段后=12pt |
+| 行距倍数 | "行距1.5倍" / "行距为2倍" | 行距=1.5 |
+| 行距最小值 | "行距最小值18磅" | 行距=最小值18pt |
+| 行距固定值 | "行距固定值20磅" | 行距=固定值20pt |
+| 粗体/斜体 | "加粗" / "斜体" / "不加粗" | 粗体=true/false |
+| 页边距 | "页边距上2.54cm" | 页边距上=2.54cm |
+
+### 支持的属性
+
+| 属性 | 示例值 | 说明 |
+|------|--------|------|
+| `字体` / `font` | 黑体、宋体、楷体 | 同时设置西文和东亚字体 |
+| `字号` / `size` | 三号、小四、14 | 支持中文字号名或磅值 |
+| `颜色` / `color` | #000000、红色、蓝色 | 支持颜色名或 #RRGGBB |
+| `粗体` / `bold` | true / false | |
+| `斜体` / `italic` | true / false | |
+| `行距` / `lineSpacing` | 1.5、2.0 | 倍数行距 |
+| `行距最小值` / `lineSpacingAtLeast` | 18pt | 最小值行距（Word AT_LEAST） |
+| `行距固定值` / `lineSpacingExact` | 20pt | 固定值行距（Word EXACTLY） |
+| `段前` / `spaceBefore` | 12pt | |
+| `段后` / `spaceAfter` | 12pt | |
+| `首行缩进` / `firstLineIndent` | 0.76cm、2字符 | 支持厘米或字符数（2字符≈0.74cm） |
+| `对齐` / `align` | 左对齐、居中、右对齐、两端对齐 | |
+| `页边距上/下/左/右` | 2.54cm | 仅当目标为"页面"时有效 |
+
+### 目标样式推断
+
+省略目标样式时，脚本从属性名自动推断：
+
+| 属性名包含 | 目标样式 |
+|-----------|---------|
+| 标题 | Heading 2 |
+| 正文 | Body Text |
+| 表格/表头 | ResearchTable |
+| 图片/图题 | Figure Paragraph |
+| 代码 | CodeBlock |
+| 引用 | Quote |
+| 注释/注 | Note |
+| 页面/页边距/纸张 | 页面 |
+
+### 使用步骤
+
+1. 在模板草稿中插入格式要求注释段落
+2. 运行脚本处理：
+
+```bash
+python <skill-path>/scripts/apply_template_formats.py \
+  --input templates/draft.docx \
+  --output templates/clean.docx
+```
+
+3. 预览变更（不实际修改）：
+
+```bash
+python <skill-path>/scripts/apply_template_formats.py \
+  --input templates/draft.docx \
+  --output templates/clean.docx \
+  --dry-run
+```
+
+### 完整示例
+
+模板草稿 `draft.docx` 内容：
+
+```text
+[[FORMAT: Heading 2: 字体=黑体, 字号=三号, 段前=12pt, 段后=6pt]]
+[[FORMAT: Body Text: 字体=宋体, 字号=小四, 行距=1.5倍]]
+[[FORMAT: 页面: 页边距上=2.54cm, 页边距下=2.54cm, 页边距左=3.17cm, 页边距右=3.17cm]]
+{{PROJECT_NAME}}
+{%p if ENABLE_RESEARCH_CONTENT %}
+{{p RESEARCH_CONTENT_SUBDOC }}
+{%p endif %}
+```
+
+处理后 `clean.docx`：
+
+- 格式要求段落已被去除
+- Heading 2 样式已设置为黑体三号
+- Body Text 样式已设置为宋体小四、1.5 倍行距
+- 页面页边距已更新
+- 只保留占位符和条件开关
+
 ## 参考文档
 
 - `docs/report_engine_template_spec.md` — 完整模板规范
