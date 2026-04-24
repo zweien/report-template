@@ -14,7 +14,11 @@ from report_engine.validator import PayloadValidationError, validate_payload
 
 
 def _load_payload(path: str):
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    text = Path(path).read_text(encoding="utf-8")
+    if path.lower().endswith((".yaml", ".yml")):
+        import yaml
+        return yaml.safe_load(text)
+    return json.loads(text)
 
 
 def cmd_validate(args: argparse.Namespace) -> int:

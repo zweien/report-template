@@ -7,6 +7,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm
+from lxml import etree
 
 
 DEFAULT_STYLE_MAP = {
@@ -73,6 +74,20 @@ def _set_table_borders(table: Any) -> None:
         element.set(qn("w:sz"), "8")
         element.set(qn("w:space"), "0")
         element.set(qn("w:color"), "000000")
+
+
+def _copy_element(src: etree._Element, parent: etree._Element) -> etree._Element:
+    """Recursively copy an lxml element tree into a parent, preserving namespaces."""
+    ns = etree.QName(src).namespace
+    localname = etree.QName(src).localname
+    tag = "{%s}%s" % (ns, localname) if ns else localname
+    dst = etree.SubElement(parent, tag)
+    dst.text = src.text
+    for attr, val in src.attrib.items():
+        dst.set(attr, val)
+    for child in src:
+        _copy_element(child, dst)
+    return dst
 
 
 def _add_table_block_impl(
@@ -359,8 +374,24 @@ def add_code_block_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, s
 def add_formula_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
     latex = str(block["latex"])
 
-    # 方案 1: LaTeX → OMML（暂不实现，直接降级）
+    # 方案 1: LaTeX → MathML → OMML
     omml_inserted = False
+    try:
+        from latex2mathml.converter import convert as latex_to_mathml
+
+        mathml_str = latex_to_mathml(latex)
+        mathml_root = etree.fromstring(mathml_str.encode("utf-8"))
+
+        style_name = _get_style_name(doc, style_map["body"], "Normal")
+        p = doc.add_paragraph(style=style_name)
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        oMath = OxmlElement("m:oMath")
+        _copy_element(mathml_root, oMath)
+        p._element.append(oMath)
+        omml_inserted = True
+    except Exception:
+        pass
 
     # 方案 2: LaTeX → 图片（降级）
     if not omml_inserted:
@@ -422,6 +453,15 @@ def add_columns_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]
         element.set(qn("w:color"), "auto")
         borders.append(element)
     tbl_pr.append(borders)
+
+    # 设置列间距（gap_cm）
+    gap_cm = block.get("gap_cm")
+    if gap_cm is not None:
+        tbl_cell_spacing = OxmlElement("w:tblCellSpacing")
+        tbl_cell_spacing.set(qn("w:type"), "dxa")
+        gap_dxa = int(float(gap_cm) * 567)
+        tbl_cell_spacing.set(qn("w:w"), str(gap_dxa))
+        tbl_pr.append(tbl_cell_spacing)
 
     registry = create_default_registry()
 

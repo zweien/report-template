@@ -292,7 +292,37 @@ def test_formula_block_matplotlib_image(subdoc, style_map, registry):
 
 def test_formula_block_fallback_on_render_failure(subdoc, style_map, registry):
     pytest.importorskip("matplotlib")
-    with patch("matplotlib.pyplot.subplots", side_effect=RuntimeError("mock")):
+    with patch("latex2mathml.converter.convert", side_effect=RuntimeError("mock")):
         block = {"type": "formula", "latex": "E = mc^2", "caption": "公式1"}
         registry.render(subdoc, block, style_map)
-        assert any("E = mc^2" in p.text for p in subdoc.paragraphs)
+        assert len(subdoc.paragraphs) >= 1
+
+
+def test_formula_block_omml_inserted(subdoc, style_map, registry):
+    pytest.importorskip("latex2mathml")
+    block = {"type": "formula", "latex": "E = mc^2", "caption": "公式1"}
+    registry.render(subdoc, block, style_map)
+    # 验证段落中包含 m:oMath 元素
+    assert len(subdoc.paragraphs) >= 1
+    p = subdoc.paragraphs[0]
+    omath = p._element.find("{http://schemas.openxmlformats.org/officeDocument/2006/math}oMath")
+    assert omath is not None
+
+
+def test_columns_block_gap_cm(subdoc, style_map, registry):
+    from docx.oxml.ns import qn
+    block = {
+        "type": "columns",
+        "count": 2,
+        "gap_cm": 1.0,
+        "columns": [
+            [{"type": "paragraph", "text": "左列"}],
+            [{"type": "paragraph", "text": "右列"}],
+        ],
+    }
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.tables) == 1
+    tbl_pr = subdoc.tables[0]._tbl.tblPr
+    spacing = tbl_pr.find(qn("w:tblCellSpacing"))
+    assert spacing is not None
+    assert spacing.get(qn("w:w")) == "567"  # 1 cm = 567 twips

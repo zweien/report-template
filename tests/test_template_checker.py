@@ -42,3 +42,13 @@ def test_template_checker_allows_bundle_without_individual_attachment_placeholde
     result = check_template_contract(minimal_template, payload)
     assert result.ok is True
     assert any("bundled appendix slot" in note for note in result.notes)
+
+
+def test_template_checker_warns_missing_context_vars(minimal_template, advanced_payload):
+    # Remove a context var that the template uses
+    payload_data = dict(advanced_payload)
+    payload_data["context"] = {}
+    payload = Payload.model_validate(payload_data)
+    result = check_template_contract(minimal_template, payload)
+    assert any("PROJECT_NAME" in w for w in result.warnings)
+    assert any("APPLICANT_ORG" in w for w in result.warnings)

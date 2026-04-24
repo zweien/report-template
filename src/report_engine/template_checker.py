@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import List
 from zipfile import ZipFile
@@ -27,6 +28,12 @@ def _read_template_xml(template_path: str) -> str:
             if name.startswith("word/") and name.endswith(".xml"):
                 xml_parts.append(zf.read(name).decode("utf-8", errors="ignore"))
         return "\n".join(xml_parts)
+
+
+def _extract_scalar_vars(xml: str) -> List[str]:
+    """Extract scalar Jinja variables like {{VAR_NAME}} from template XML."""
+    pattern = r"\{\{\s*([A-Z_][A-Z0-9_]*)\b"
+    return sorted(set(re.findall(pattern, xml)))
 
 
 def check_template_contract(template_path: str, payload: Payload) -> TemplateCheckResult:
@@ -78,6 +85,12 @@ def check_template_contract(template_path: str, payload: Payload) -> TemplateChe
 
     if missing_flags and not missing_placeholders:
         notes.append("Some placeholders exist without matching flags; template may use fixed titles outside condition blocks.")
+
+    # Check for missing context variables
+    scalar_vars = _extract_scalar_vars(xml)
+    for var in scalar_vars:
+        if var not in payload.context:
+            warnings.append(f"Context variable '{var}' used in template but not provided in payload")
 
     return TemplateCheckResult(
         ok=not missing_placeholders and not missing_flags,
