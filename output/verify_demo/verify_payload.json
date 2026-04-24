@@ -1,0 +1,321 @@
+{
+  "context": {
+    "PROJECT_NAME": "AI教育应用研究报告",
+    "APPLICANT_ORG": "教育技术研究中心",
+    "PROJECT_LEADER": "研究团队",
+    "PROJECT_PERIOD": "2026年1月—2026年4月"
+  },
+  "sections": [
+    {
+      "id": "section_1",
+      "placeholder": "SECTION_1_SUBDOC",
+      "flag_name": "ENABLE_SECTION_1",
+      "enabled": true,
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "1.1 研究背景",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "随着人工智能技术的快速发展，AI在教育领域的应用日益广泛。2025-2026年，以大语言模型为代表的AI技术在个性化学习、智能批改、虚拟教师等方向取得突破性进展。教育部积极推动AI赋能教育，鼓励智慧课堂建设，为AI教育应用提供了政策支持。"
+        },
+        {
+          "type": "quote",
+          "text": "教育是国之大计、党之大计。",
+          "source": "《中国教育现代化2035》"
+        },
+        {
+          "type": "heading",
+          "text": "1.2 研究目标",
+          "level": 2
+        },
+        {
+          "type": "bullet_list",
+          "items": [
+            "梳理AI教育应用的主要方向和技术路线",
+            "分析个性化学习和智能批改的最新进展",
+            "评估AI教育应用的实际效果和挑战",
+            "提出未来发展方向和政策建议"
+          ]
+        },
+        {
+          "type": "note",
+          "text": "本报告数据截至2026年4月，部分预测性内容基于行业趋势分析。"
+        }
+      ],
+      "order": 1
+    },
+    {
+      "id": "section_2",
+      "placeholder": "SECTION_2_SUBDOC",
+      "flag_name": "ENABLE_SECTION_2",
+      "enabled": true,
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "2.1 个性化学习",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "个性化学习是AI教育应用的核心方向之一。当前主要技术方案包括：自适应学习平台（如松鼠AI、好未来）根据学生知识图谱动态调整学习路径；大模型驱动的1对1辅导（如Khan Academy的Khanmigo、网易有道AI学习助手）提供实时答疑和个性化指导；多模态学习者画像结合语音、表情、行为轨迹等数据，实时识别学习状态。"
+        },
+        {
+          "type": "heading",
+          "text": "2.2 智能批改",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "智能批改技术在2025-2026年取得显著突破。大语言模型在作文批改、编程作业批改方面能给出详细反馈和改进建议；数学推理题批改不仅能判对错，还能识别解题过程中的逻辑错误和步骤缺失；多模态作业批改支持手写文字识别(OCR)、图表分析、语音作业评测等。"
+        },
+        {
+          "type": "heading",
+          "text": "2.3 AI教育应用领域分布",
+          "level": 2
+        },
+        {
+          "type": "image",
+          "path": "figures/ai_edu_distribution.png",
+          "width_cm": 12,
+          "caption": "图1：AI教育应用领域分布",
+          "legend": "数据来源：行业研究报告综合分析"
+        },
+        {
+          "type": "heading",
+          "text": "2.4 主要参与者",
+          "level": 2
+        },
+        {
+          "type": "table",
+          "title": "表1：AI教育主要参与者",
+          "headers": [
+            "类别",
+            "企业/产品",
+            "核心能力"
+          ],
+          "rows": [
+            [
+              "国内",
+              "科大讯飞、好未来、猿辅导",
+              "智慧课堂、自适应学习"
+            ],
+            [
+              "海外",
+              "Khan Academy、Duolingo",
+              "AI Tutor、语言学习"
+            ],
+            [
+              "大模型",
+              "GPT-4、文心一言、通义千问",
+              "通用AI能力"
+            ]
+          ]
+        },
+        {
+          "type": "code_block",
+          "code": "# 个性化推荐算法伪代码\ndef recommend_next_item(student_profile, knowledge_graph):\n    weak_points = identify_weak_points(student_profile)\n    candidates = get_related_items(weak_points, knowledge_graph)\n    return rank_by_difficulty(candidates, student_profile.level)",
+          "language": "python"
+        }
+      ],
+      "order": 2
+    },
+    {
+      "id": "section_3",
+      "placeholder": "SECTION_3_SUBDOC",
+      "flag_name": "ENABLE_SECTION_3",
+      "enabled": true,
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "3.1 个性化学习效果",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "通过对多个自适应学习平台的对比测试，AI个性化学习系统在以下指标上表现突出："
+        },
+        {
+          "type": "table",
+          "title": "表2：个性化学习效果对比",
+          "headers": [
+            "指标",
+            "传统教学",
+            "AI辅助",
+            "提升幅度"
+          ],
+          "rows": [
+            [
+              "学习效率",
+              "基准",
+              "+35%",
+              "显著"
+            ],
+            [
+              "知识掌握度",
+              "72%",
+              "89%",
+              "+17%"
+            ],
+            [
+              "学习满意度",
+              "3.6/5",
+              "4.3/5",
+              "+19%"
+            ]
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "3.2 智能批改准确率",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "智能批改系统在不同题型上的准确率如下："
+        },
+        {
+          "type": "table",
+          "title": "表3：智能批改准确率",
+          "headers": [
+            "题型",
+            "准确率",
+            "备注"
+          ],
+          "rows": [
+            [
+              "客观题",
+              "99.2%",
+              "接近人工水平"
+            ],
+            [
+              "主观题-作文",
+              "87.5%",
+              "语义理解准确"
+            ],
+            [
+              "数学推理题",
+              "92.3%",
+              "步骤识别良好"
+            ],
+            [
+              "编程作业",
+              "94.8%",
+              "逻辑分析强"
+            ]
+          ]
+        },
+        {
+          "type": "checklist",
+          "items": [
+            {
+              "text": "个性化学习系统效果验证",
+              "checked": true
+            },
+            {
+              "text": "智能批改准确率评估",
+              "checked": true
+            },
+            {
+              "text": "用户满意度调查",
+              "checked": true
+            },
+            {
+              "text": "数据隐私合规审查",
+              "checked": false
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "text": "实验数据来源于3所试点学校、500+学生的实际使用数据。"
+        }
+      ],
+      "order": 3
+    },
+    {
+      "id": "section_4",
+      "placeholder": "SECTION_4_SUBDOC",
+      "flag_name": "ENABLE_SECTION_4",
+      "enabled": true,
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "4.1 主要结论",
+          "level": 2
+        },
+        {
+          "type": "numbered_list",
+          "items": [
+            "AI个性化学习能显著提升学习效率和知识掌握度",
+            "智能批改技术在客观题上已接近人工水平，主观题仍有提升空间",
+            "大模型驱动的AI Tutor是未来教育的重要方向",
+            "数据隐私和教育公平是需要持续关注的挑战"
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "4.2 未来展望",
+          "level": 2
+        },
+        {
+          "type": "paragraph",
+          "text": "未来3-5年，AI教育应用将呈现以下趋势：AI Agent教育应用（AI助教具备自主规划能力）、多智能体协作（模拟课堂讨论场景）、虚拟教师/数字人（拟人化教学体验）、AI+VR/AR沉浸式学习（虚拟实验室、历史场景还原）。同时，教育数据隐私保护和AI伦理监管将成为行业发展的关键约束。"
+        },
+        {
+          "type": "horizontal_rule"
+        },
+        {
+          "type": "paragraph",
+          "text": "本报告由教育技术研究中心完成，如有疑问请联系研究团队。"
+        }
+      ],
+      "order": 4
+    }
+  ],
+  "attachments": [
+    {
+      "id": "appendix_1",
+      "placeholder": "APPENDIX_1_SUBDOC",
+      "flag_name": "ENABLE_APPENDIX_1",
+      "enabled": true,
+      "title": "参考文献",
+      "title_level": 2,
+      "blocks": [
+        {
+          "type": "numbered_list",
+          "items": [
+            "教育部. 人工智能赋能教育行动计划[Z]. 2025.",
+            "艾瑞咨询. 2025年中国AI教育行业研究报告[R]. 2025.",
+            "Khan Academy. Khanmigo: AI-powered tutoring[EB/OL]. 2025.",
+            "UNESCO. AI and Education: Guidance for Policy-makers[R]. 2025."
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "（附件完）"
+        }
+      ],
+      "order": 1
+    }
+  ],
+  "attachments_bundle": {
+    "enabled": true,
+    "placeholder": "APPENDICES_SUBDOC",
+    "flag_name": "ENABLE_APPENDICES",
+    "page_break_between_attachments": true,
+    "include_attachment_title": true
+  },
+  "style_map": {
+    "table": "ResearchTable",
+    "appendix_table": "AppendixTable",
+    "figure_paragraph": "Figure Paragraph",
+    "legend": "Legend",
+    "note": "Note",
+    "quote": "Quote",
+    "checklist": "Checklist",
+    "code_block": "CodeBlock"
+  }
+}
