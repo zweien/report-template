@@ -302,11 +302,20 @@ def test_formula_block_omml_inserted(subdoc, style_map, registry):
     pytest.importorskip("latex2mathml")
     block = {"type": "formula", "latex": "E = mc^2", "caption": "公式1"}
     registry.render(subdoc, block, style_map)
-    # 验证段落中包含 m:oMath 元素
+    # 验证段落中包含 m:oMath 元素，且内部为 OMML 标签而非 MathML
     assert len(subdoc.paragraphs) >= 1
     p = subdoc.paragraphs[0]
     omath = p._element.find("{http://schemas.openxmlformats.org/officeDocument/2006/math}oMath")
     assert omath is not None
+    # 应包含 OMML 的 m:r / m:t / m:sSup，不应包含 MathML 的 math/mrow/mi
+    mml_ns = "{http://www.w3.org/1998/Math/MathML}"
+    assert omath.find(f"{mml_ns}math") is None
+    assert omath.find(f"{mml_ns}mrow") is None
+    assert omath.find(f"{mml_ns}mi") is None
+    omml_ns = "{http://schemas.openxmlformats.org/officeDocument/2006/math}"
+    assert omath.find(f"{omml_ns}r") is not None
+    assert omath.find(f".//{omml_ns}t") is not None
+    assert omath.find(f"{omml_ns}sSup") is not None
 
 
 def test_columns_block_gap_cm(subdoc, style_map, registry):

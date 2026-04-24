@@ -76,18 +76,75 @@ def _set_table_borders(table: Any) -> None:
         element.set(qn("w:color"), "000000")
 
 
-def _copy_element(src: etree._Element, parent: etree._Element) -> etree._Element:
-    """Recursively copy an lxml element tree into a parent, preserving namespaces."""
-    ns = etree.QName(src).namespace
-    localname = etree.QName(src).localname
-    tag = "{%s}%s" % (ns, localname) if ns else localname
-    dst = etree.SubElement(parent, tag)
-    dst.text = src.text
-    for attr, val in src.attrib.items():
-        dst.set(attr, val)
-    for child in src:
-        _copy_element(child, dst)
-    return dst
+MATHML_NS = "http://www.w3.org/1998/Math/MathML"
+
+
+def _mathml_to_omml(src: etree._Element, parent: etree._Element) -> None:
+    """Convert a MathML element tree into OMML (m:oMath children)."""
+    tag = etree.QName(src).localname
+
+    if tag in ("math", "mrow"):
+        for child in src:
+            _mathml_to_omml(child, parent)
+    elif tag == "mi":
+        r = OxmlElement("m:r")
+        rPr = OxmlElement("m:rPr")
+        sty = OxmlElement("m:sty")
+        sty.set(qn("m:val"), "i")
+        rPr.append(sty)
+        r.append(rPr)
+        t = OxmlElement("m:t")
+        t.text = src.text
+        r.append(t)
+        parent.append(r)
+    elif tag in ("mo", "mn"):
+        r = OxmlElement("m:r")
+        t = OxmlElement("m:t")
+        t.text = src.text
+        r.append(t)
+        parent.append(r)
+    elif tag == "msup":
+        sSup = OxmlElement("m:sSup")
+        e = OxmlElement("m:e")
+        _mathml_to_omml(src[0], e)
+        sSup.append(e)
+        sup = OxmlElement("m:sup")
+        _mathml_to_omml(src[1], sup)
+        sSup.append(sup)
+        parent.append(sSup)
+    elif tag == "msub":
+        sSub = OxmlElement("m:sSub")
+        e = OxmlElement("m:e")
+        _mathml_to_omml(src[0], e)
+        sSub.append(e)
+        sub = OxmlElement("m:sub")
+        _mathml_to_omml(src[1], sub)
+        sSub.append(sub)
+        parent.append(sSub)
+    elif tag == "msubsup":
+        sSubSup = OxmlElement("m:sSubSup")
+        e = OxmlElement("m:e")
+        _mathml_to_omml(src[0], e)
+        sSubSup.append(e)
+        sub = OxmlElement("m:sub")
+        _mathml_to_omml(src[1], sub)
+        sSubSup.append(sub)
+        sup = OxmlElement("m:sup")
+        _mathml_to_omml(src[2], sup)
+        sSubSup.append(sup)
+        parent.append(sSubSup)
+    elif tag == "mfrac":
+        f = OxmlElement("m:f")
+        num = OxmlElement("m:num")
+        _mathml_to_omml(src[0], num)
+        f.append(num)
+        den = OxmlElement("m:den")
+        _mathml_to_omml(src[1], den)
+        f.append(den)
+        parent.append(f)
+    else:
+        for child in src:
+            _mathml_to_omml(child, parent)
 
 
 def _add_table_block_impl(
@@ -387,7 +444,7 @@ def add_formula_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         oMath = OxmlElement("m:oMath")
-        _copy_element(mathml_root, oMath)
+        _mathml_to_omml(mathml_root, oMath)
         p._element.append(oMath)
         omml_inserted = True
     except Exception:
