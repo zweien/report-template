@@ -18,7 +18,12 @@ STYLE_TYPE_REQUIREMENTS = {
     "figure_paragraph": WD_STYLE_TYPE.PARAGRAPH,
     "bullet_list": WD_STYLE_TYPE.PARAGRAPH,
     "numbered_list": WD_STYLE_TYPE.PARAGRAPH,
+    "note": WD_STYLE_TYPE.PARAGRAPH,
+    "quote": WD_STYLE_TYPE.PARAGRAPH,
+    "checklist": WD_STYLE_TYPE.PARAGRAPH,
+    "code_block": WD_STYLE_TYPE.PARAGRAPH,
     "table": WD_STYLE_TYPE.TABLE,
+    "appendix_table": WD_STYLE_TYPE.TABLE,
 }
 
 

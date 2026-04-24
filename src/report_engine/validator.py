@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -31,6 +32,8 @@ BLOCK_REQUIRED_FIELDS = {
     "columns": ["count", "columns"],
 }
 
+logger = logging.getLogger("report_engine")
+
 
 class PayloadValidationError(ValueError):
     pass
@@ -54,6 +57,11 @@ def _validate_block_fields(block: Dict[str, Any], scope: str) -> None:
 def validate_payload(payload: Dict[str, Any], *, strict_images: bool = False) -> Tuple[Payload, List[str]]:
     normalized = normalize_payload(payload)
     model = Payload.model_validate(normalized)
+    logger.debug(
+        "Validating payload with %d sections, %d attachments",
+        len(model.sections),
+        len(model.attachments),
+    )
 
     warnings: List[str] = []
     section_ids = set()

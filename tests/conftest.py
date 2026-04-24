@@ -43,6 +43,8 @@ def minimal_template(tmp_path: Path) -> str:
         "List Number",
         "Note",
         "Quote",
+        "Checklist",
+        "CodeBlock",
     ]
     for name in paragraph_styles:
         try:
@@ -50,10 +52,11 @@ def minimal_template(tmp_path: Path) -> str:
         except ValueError:
             pass
 
-    try:
-        doc.styles.add_style("ResearchTable", WD_STYLE_TYPE.TABLE)
-    except ValueError:
-        pass
+    for table_style_name in ["ResearchTable", "AppendixTable"]:
+        try:
+            doc.styles.add_style(table_style_name, WD_STYLE_TYPE.TABLE)
+        except ValueError:
+            pass
 
     doc.add_paragraph("{{PROJECT_NAME}}")
     doc.add_paragraph("{{APPLICANT_ORG}}")

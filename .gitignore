@@ -7,4 +7,9 @@ __pycache__/
 venv/
 dist/
 build/
+
+# Word lock files
+.~lock.*#
+*.docx#
+
 output/

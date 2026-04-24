@@ -75,6 +75,40 @@ def _set_table_borders(table: Any) -> None:
         element.set(qn("w:color"), "000000")
 
 
+def _add_table_block_impl(
+    doc: Any,
+    block: Dict[str, Any],
+    style_map: Dict[str, str],
+    default_style: str,
+) -> None:
+    if block.get("title"):
+        caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+        doc.add_paragraph(str(block["title"]), style=caption_style)
+
+    headers = block["headers"]
+    rows = block["rows"]
+    table_style = block.get("style") or default_style
+    table_style = _get_style_name(doc, table_style, "Table Grid")
+
+    table = doc.add_table(rows=1, cols=len(headers))
+    table.style = table_style
+
+    hdr_cells = table.rows[0].cells
+    for i, header in enumerate(headers):
+        hdr_cells[i].text = "" if header is None else str(header)
+
+    for row in rows:
+        row_cells = table.add_row().cells
+        for i, value in enumerate(row):
+            row_cells[i].text = "" if value is None else str(value)
+
+    if block.get("force_borders", True):
+        _set_table_borders(table)
+
+    body_style = _get_style_name(doc, style_map["body"], "Normal")
+    doc.add_paragraph("", style=body_style)
+
+
 def add_heading_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
     level = int(block.get("level", 2))
     if level <= 2:
@@ -110,32 +144,7 @@ def add_page_break_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, s
 
 
 def add_table_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
-    if block.get("title"):
-        caption_style = _get_style_name(doc, style_map["caption"], "Caption")
-        doc.add_paragraph(str(block["title"]), style=caption_style)
-
-    headers = block["headers"]
-    rows = block["rows"]
-    table_style = block.get("style") or style_map["table"]
-    table_style = _get_style_name(doc, table_style, "Table Grid")
-
-    table = doc.add_table(rows=1, cols=len(headers))
-    table.style = table_style
-
-    hdr_cells = table.rows[0].cells
-    for i, header in enumerate(headers):
-        hdr_cells[i].text = "" if header is None else str(header)
-
-    for row in rows:
-        row_cells = table.add_row().cells
-        for i, value in enumerate(row):
-            row_cells[i].text = "" if value is None else str(value)
-
-    if block.get("force_borders", True):
-        _set_table_borders(table)
-
-    body_style = _get_style_name(doc, style_map["body"], "Normal")
-    doc.add_paragraph("", style=body_style)
+    _add_table_block_impl(doc, block, style_map, style_map["table"])
 
 
 def add_image_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
@@ -234,7 +243,8 @@ def add_two_images_row_block(doc: Any, block: Dict[str, Any], style_map: Dict[st
         cell = table.cell(0, i)
         cell.text = ""
         p = cell.paragraphs[0]
-        p.style = doc.styles[figure_style] if figure_style in [s.name for s in doc.styles] else doc.styles[style_map["body"]]
+        figure_style_name = _get_style_name(doc, figure_style, style_map["body"])
+        p.style = doc.styles[figure_style_name]
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         image_path = Path(img["path"])
@@ -250,7 +260,8 @@ def add_two_images_row_block(doc: Any, block: Dict[str, Any], style_map: Dict[st
 
         if img.get("caption"):
             cp = cell.add_paragraph(str(img["caption"]))
-            cp.style = doc.styles[caption_style] if caption_style in [s.name for s in doc.styles] else doc.styles[style_map["body"]]
+            caption_style_name = _get_style_name(doc, caption_style, style_map["body"])
+            cp.style = doc.styles[caption_style_name]
             cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     body_style = _get_style_name(doc, style_map["body"], "Normal")
@@ -258,32 +269,8 @@ def add_two_images_row_block(doc: Any, block: Dict[str, Any], style_map: Dict[st
 
 
 def add_appendix_table_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
-    if block.get("title"):
-        caption_style = _get_style_name(doc, style_map["caption"], "Caption")
-        doc.add_paragraph(str(block["title"]), style=caption_style)
-
-    headers = block["headers"]
-    rows = block["rows"]
-    table_style = block.get("style") or style_map.get("appendix_table", style_map["table"])
-    table_style = _get_style_name(doc, table_style, "Table Grid")
-
-    table = doc.add_table(rows=1, cols=len(headers))
-    table.style = table_style
-
-    hdr_cells = table.rows[0].cells
-    for i, header in enumerate(headers):
-        hdr_cells[i].text = "" if header is None else str(header)
-
-    for row in rows:
-        row_cells = table.add_row().cells
-        for i, value in enumerate(row):
-            row_cells[i].text = "" if value is None else str(value)
-
-    if block.get("force_borders", True):
-        _set_table_borders(table)
-
-    body_style = _get_style_name(doc, style_map["body"], "Normal")
-    doc.add_paragraph("", style=body_style)
+    default_style = style_map.get("appendix_table", style_map["table"])
+    _add_table_block_impl(doc, block, style_map, default_style)
 
 
 def add_checklist_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:

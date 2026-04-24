@@ -15,6 +15,10 @@ def _save_doc(tmp_path, *, include_table_style=True, wrong_table_type=False):
         "Figure Paragraph",
         "List Bullet",
         "List Number",
+        "Note",
+        "Quote",
+        "Checklist",
+        "CodeBlock",
     ]:
         try:
             doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
@@ -25,6 +29,10 @@ def _save_doc(tmp_path, *, include_table_style=True, wrong_table_type=False):
         try:
             style_type = WD_STYLE_TYPE.PARAGRAPH if wrong_table_type else WD_STYLE_TYPE.TABLE
             doc.styles.add_style("ResearchTable", style_type)
+        except ValueError:
+            pass
+        try:
+            doc.styles.add_style("AppendixTable", WD_STYLE_TYPE.TABLE)
         except ValueError:
             pass
 

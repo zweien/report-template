@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -12,6 +13,8 @@ from report_engine.style_checker import ensure_template_styles
 from report_engine.subdoc import build_subdoc
 from report_engine.template_checker import ensure_template_contract
 from report_engine.validator import validate_payload
+
+logger = logging.getLogger("report_engine")
 
 
 def _build_sections_context(
@@ -108,10 +111,12 @@ def render_report(
     strict_images: bool = False,
     check_template: bool = True,
 ) -> List[str]:
+    logger.info("Rendering report: %s -> %s", template_path, output_path)
     normalized = normalize_payload(payload)
     payload_model, warnings = validate_payload(normalized, strict_images=strict_images)
 
     if check_template:
+        logger.debug("Running template checks")
         ensure_template_styles(template_path, payload_model.style_map)
         ensure_template_contract(template_path, payload_model)
 
@@ -126,6 +131,7 @@ def render_report(
     tpl.render(context, autoescape=True)
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     tpl.save(output_path)
+    logger.info("Report saved: %s", output_path)
     return warnings
 
 
