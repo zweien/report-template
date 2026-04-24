@@ -192,6 +192,11 @@ Phase 1 推荐 payload 结构如下：
 - `table`
 - `bullet_list`
 - `numbered_list`
+- `note`
+- `quote`
+- `appendix_table`
+- `checklist`
+- `code_block`
 
 ---
 

@@ -16,6 +16,8 @@
   - P2：`appendix_table`、`checklist`、`horizontal_rule`
   - P3：`toc_placeholder`、`code_block`、`formula`、`columns`
   - 原有：`heading`、`paragraph`、`bullet_list`、`numbered_list`、`table`、`image`、`page_break`
+- `ai_edu_skeleton.json`：通用研究报告 payload 骨架模板，适用于教育/科研领域的研究报告场景，可作为大模型生成 payload 的结构参考
+- `verify_issue4.yaml`：Issue #4 功能验证 payload，覆盖 formula（OMML 公式）、columns（多列布局）、嵌套表格等高级特性
 
 推荐优先使用 `grant_advanced_demo.json` 进行日常开发验证，使用 `test_all_blocks.json` 进行全量 block 类型测试。
 

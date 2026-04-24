@@ -1,6 +1,8 @@
 # report-template
 
-一个基于 `docxtpl + python-docx` 的 Word 文档生成项目，当前正从“项目申报书自动生成原型”演进为一个**通用报告模板引擎**。
+[![CI](https://github.com/zweien/report-template/actions/workflows/ci.yml/badge.svg)](https://github.com/zweien/report-template/actions/workflows/ci.yml)
+
+一个基于 `docxtpl + python-docx` 的 Word 文档生成项目，当前正从”项目申报书自动生成原型”演进为一个**通用报告模板引擎**。
 
 项目的核心思路是：
 
@@ -151,24 +153,28 @@ report-template/
 
 ## 6. 安装
 
-建议使用 Python 3.10 及以上。
+需要 Python 3.10+。推荐使用 [uv](https://docs.astral.sh/uv/) 管理依赖：
 
-### 使用 `pyproject.toml` 安装
+```bash
+uv pip install -e ".[dev]"
+```
+
+或使用 pip：
 
 ```bash
 pip install -e ".[dev]"
-```
-
-### 或使用 `requirements.txt`
-
-```bash
-pip install -r requirements.txt
 ```
 
 安装后可以使用 CLI：
 
 ```bash
 report-engine --help
+```
+
+开发前建议安装 pre-commit：
+
+```bash
+pre-commit install
 ```
 
 ---
@@ -381,12 +387,8 @@ payload 写法参考：
 
 ## 13. 当前限制
 
-当前项目已从 Phase 1 进入扩展阶段，下面这些内容仍在逐步完善：
-
 - 更严格的运行级回归验证
 - 更多模板适配样例
-- formula 的 OMML 原生公式支持（当前降级为图片/纯文本）
-- columns 内嵌套 table 的支持
 - 更完整的错误提示和日志输出
 - Phase 2 的 Agent Skill 封装
 
