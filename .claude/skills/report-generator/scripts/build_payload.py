@@ -148,8 +148,6 @@ def build_section(section: dict, index: int) -> dict:
         "enabled": section.get("enabled", True),
         "blocks": blocks,
         "order": index + 1,
-        "subdoc_title": name,
-        "subdoc_title_level": 2,
     }
 
 
