@@ -1,5 +1,9 @@
 import pytest
 
+from unittest.mock import patch
+
+import pytest
+
 from report_engine.blocks import BlockRenderError, BlockRegistry, create_default_registry
 
 
@@ -229,3 +233,66 @@ def test_p3_blocks_in_registry():
     assert "code_block" in registry._renderers
     assert "formula" in registry._renderers
     assert "columns" in registry._renderers
+
+
+def test_style_map_override_heading(subdoc, style_map, registry):
+    custom = dict(style_map)
+    custom["heading_2"] = "Heading 3"
+    registry.render(subdoc, {"type": "heading", "text": "标题", "level": 2}, custom)
+    assert subdoc.paragraphs[0].style.name == "Heading 3"
+
+
+def test_style_map_fallback_for_missing_style(subdoc, style_map, registry):
+    custom = dict(style_map)
+    custom["heading_2"] = "NonExistentStyle"
+    registry.render(subdoc, {"type": "heading", "text": "标题", "level": 2}, custom)
+    assert subdoc.paragraphs[0].style.name == "Heading 2"
+
+
+def test_columns_block_nested_table(subdoc, style_map, registry):
+    block = {
+        "type": "columns",
+        "count": 2,
+        "columns": [
+            [{"type": "table", "headers": ["A"], "rows": [["1"]]}],
+            [{"type": "paragraph", "text": "右列"}],
+        ],
+    }
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.tables) == 1
+    table = subdoc.tables[0]
+    assert len(table.columns) == 2
+    assert len(table.cell(0, 0).tables) == 1
+    assert table.cell(0, 0).tables[0].rows[0].cells[0].text == "A"
+    assert "右列" in table.cell(0, 1).text
+
+
+def test_columns_block_nested_bullet_list(subdoc, style_map, registry):
+    block = {
+        "type": "columns",
+        "count": 2,
+        "columns": [
+            [{"type": "bullet_list", "items": ["item1", "item2"]}],
+            [{"type": "paragraph", "text": "右列"}],
+        ],
+    }
+    registry.render(subdoc, block, style_map)
+    table = subdoc.tables[0]
+    left_cell = table.cell(0, 0)
+    assert any("item1" in p.text for p in left_cell.paragraphs)
+    assert any("item2" in p.text for p in left_cell.paragraphs)
+
+
+def test_formula_block_matplotlib_image(subdoc, style_map, registry):
+    pytest.importorskip("matplotlib")
+    block = {"type": "formula", "latex": "E = mc^2", "caption": "公式1"}
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.paragraphs) >= 1
+
+
+def test_formula_block_fallback_on_render_failure(subdoc, style_map, registry):
+    pytest.importorskip("matplotlib")
+    with patch("matplotlib.pyplot.subplots", side_effect=RuntimeError("mock")):
+        block = {"type": "formula", "latex": "E = mc^2", "caption": "公式1"}
+        registry.render(subdoc, block, style_map)
+        assert any("E = mc^2" in p.text for p in subdoc.paragraphs)
