@@ -30,6 +30,7 @@ BLOCK_REQUIRED_FIELDS = {
     "code_block": ["code"],
     "formula": ["latex"],
     "columns": ["count", "columns"],
+    "ascii_diagram": ["ascii"],
 }
 
 logger = logging.getLogger("report_engine")
