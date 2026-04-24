@@ -106,10 +106,10 @@ python <skill-path>/scripts/analyze_template.py --template path/to/template.docx
 
 ```bash
 # 图表：用 matplotlib 生成
-python <skill-path>/scripts/generate_chart.py --type bar --data '{"labels":["A","B"],"values":[10,20]}' --output figures/chart.png
+python <skill-path>/scripts/generate_chart.py --type bar --data '{"labels":["A","B"],"values":[10,20]}' --output output/figures/chart.png
 
 # Mermaid 图：用 mermaid-cli 生成
-python <skill-path>/scripts/render_mermaid.py --input diagram.mmd --output figures/diagram.png
+python <skill-path>/scripts/render_mermaid.py --input diagram.mmd --output output/figures/diagram.png
 
 # 文生图：调用外部 API（需要用户配置）
 # 使用 WebFetch 或 MCP 工具调用 DALL-E / Stable Diffusion
@@ -153,12 +153,12 @@ python <skill-path>/scripts/render_mermaid.py --input diagram.mmd --output figur
 
 ```bash
 # 1. Claude 生成简化内容描述（比完整 payload 简单得多）
-# 保存到 data/generated/<report_name>_content.json
+# 保存到 output/<report_name>_content.json
 
 # 2. 用 build_payload.py 自动构建合法 payload
 python <skill-path>/scripts/build_payload.py \
-  --content data/generated/<report_name>_content.json \
-  --output data/generated/<report_name>.json \
+  --content output/<report_name>_content.json \
+  --output output/<report_name>.json \
   --template path/to/template.docx
 ```
 
@@ -201,13 +201,13 @@ python <skill-path>/scripts/build_payload.py \
 
 ```bash
 # 1. 校验 payload
-report-engine validate --payload data/generated/<report_name>.json
+report-engine validate --payload output/<report_name>.json
 
 # 2. 检查模板契约
-report-engine check-template --template path/to/template.docx --payload data/generated/<report_name>.json
+report-engine check-template --template path/to/template.docx --payload output/<report_name>.json
 
 # 3. 渲染输出
-report-engine render --template path/to/template.docx --payload data/generated/<report_name>.json --output output/<report_name>.docx
+report-engine render --template path/to/template.docx --payload output/<report_name>.json --output output/<report_name>.docx
 ```
 
 如果校验失败，根据错误信息修复 payload 后重试。
@@ -235,7 +235,7 @@ python <skill-path>/scripts/generate_chart.py \
   --type bar \
   --title "项目进度" \
   --data '{"labels":["Q1","Q2","Q3","Q4"],"values":[25,50,75,100]}' \
-  --output figures/progress.png
+  --output output/figures/progress.png
 ```
 
 支持类型：`bar`（柱状图）、`line`（折线图）、`pie`（饼图）、`scatter`（散点图）
@@ -245,7 +245,7 @@ python <skill-path>/scripts/generate_chart.py \
 ```bash
 python <skill-path>/scripts/render_mermaid.py \
   --input diagram.mmd \
-  --output figures/diagram.png
+  --output output/figures/diagram.png
 ```
 
 ### 文生图
