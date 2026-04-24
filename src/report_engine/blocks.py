@@ -490,6 +490,346 @@ def add_formula_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]
         cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 
+def _has_cjk(text: str) -> bool:
+    """检测文本是否包含 CJK 字符。"""
+    for ch in text:
+        cp = ord(ch)
+        if (
+            0x4E00 <= cp <= 0x9FFF  # CJK Unified Ideographs
+            or 0x3400 <= cp <= 0x4DBF  # CJK Extension A
+            or 0x3000 <= cp <= 0x303F  # CJK Symbols and Punctuation
+            or 0xFF00 <= cp <= 0xFFEF  # Halfwidth and Fullwidth Forms
+            or 0x3040 <= cp <= 0x309F  # Hiragana
+            or 0x30A0 <= cp <= 0x30FF  # Katakana
+            or 0xAC00 <= cp <= 0xD7AF  # Hangul Syllables
+        ):
+            return True
+    return False
+
+
+def add_ascii_diagram_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    """将 ASCII 文本渲染为图片插入文档。
+
+    策略：
+    - 纯 ASCII（无 CJK）：用 Pillow + 等宽字体渲染为图片
+    - 含 CJK 字符：用 Pillow 双字体渲染（ASCII 等宽字体 + CJK 字体），
+      CJK 字符占 2 列宽度，通过网格对齐保持 ASCII 图结构
+    - Pillow 不可用或字体缺失时降级为 Word 内等宽文本表格渲染
+    """
+    ascii_text = str(block["ascii"])
+    lines = ascii_text.split("\n")
+
+    # 样式参数
+    font_size = int(block.get("font_size", 14))
+    padding = int(block.get("padding", 20))
+    bg_color = block.get("bg_color", "#F8F8F8")
+    fg_color = block.get("fg_color", "#333333")
+
+    # 检测是否含 CJK 字符
+    contains_cjk = _has_cjk(ascii_text)
+
+    if not contains_cjk:
+        # 纯 ASCII：用 Pillow 渲染为图片
+        try:
+            from PIL import Image, ImageDraw, ImageFont
+            from io import BytesIO
+
+            # 尝试加载等宽字体
+            font_paths = [
+                "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+                "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf",
+                "/usr/share/fonts/truetype/courier/Courier_New.ttf",
+                "/System/Library/Fonts/Courier.ttc",
+                "C:/Windows/fonts/cour.ttf",
+            ]
+            font = None
+            for fp in font_paths:
+                try:
+                    font = ImageFont.truetype(fp, font_size)
+                    break
+                except Exception:
+                    continue
+            if font is None:
+                font = ImageFont.load_default()
+
+            # 计算尺寸（逐字符测量，处理不等宽情况）
+            max_width = 0
+            total_height = 0
+            line_heights = []
+            line_widths = []
+
+            for line in lines:
+                line_width = 0
+                line_height = 0
+                for ch in line:
+                    bbox = font.getbbox(ch)
+                    if bbox:
+                        ch_w = bbox[2] - bbox[0]
+                        ch_h = bbox[3] - bbox[1]
+                        line_width += ch_w
+                        line_height = max(line_height, ch_h)
+                line_widths.append(line_width)
+                line_heights.append(line_height)
+                max_width = max(max_width, line_width)
+                total_height += int(line_height * 1.3) if line_height else font_size
+
+            line_spacing = int((line_heights[0] if line_heights else font_size) * 1.3)
+            if line_spacing == 0:
+                line_spacing = font_size + 4
+
+            img_width = max_width + padding * 2
+            img_height = total_height + padding * 2
+
+            # 创建图片
+            img = Image.new("RGB", (img_width, img_height), bg_color)
+            draw = ImageDraw.Draw(img)
+
+            y = padding
+            for line in lines:
+                x = padding
+                for ch in line:
+                    draw.text((x, y), ch, font=font, fill=fg_color)
+                    bbox = font.getbbox(ch)
+                    if bbox:
+                        x += bbox[2] - bbox[0]
+                y += line_spacing
+
+            # 保存到内存缓冲区
+            buf = BytesIO()
+            img.save(buf, format="PNG")
+            buf.seek(0)
+
+            # 插入到 Word
+            figure_style = _get_style_name(
+                doc, style_map.get("figure_paragraph", style_map["body"]), style_map["body"]
+            )
+            p = doc.add_paragraph(style=figure_style)
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = p.add_run()
+            width_cm = block.get("width_cm")
+            if width_cm is not None:
+                run.add_picture(buf, width=Cm(float(width_cm)))
+            else:
+                run.add_picture(buf)
+
+            # caption
+            if block.get("caption"):
+                caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+                cp = doc.add_paragraph(str(block["caption"]), style=caption_style)
+                cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            body_style = _get_style_name(doc, style_map["body"], "Normal")
+            doc.add_paragraph("", style=body_style)
+            return
+
+        except Exception:
+            # Pillow 失败则降级为文本渲染
+            pass
+
+    # 含 CJK：用 Pillow 双字体渲染（ASCII 字体 + CJK 字体），失败则降级为 Word 文本
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        from io import BytesIO
+
+        # 加载 ASCII 等宽字体
+        ascii_font_paths = [
+            "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+            "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf",
+            "/usr/share/fonts/truetype/courier/Courier_New.ttf",
+            "/System/Library/Fonts/Courier.ttc",
+            "C:/Windows/fonts/cour.ttf",
+        ]
+        ascii_font = None
+        for fp in ascii_font_paths:
+            try:
+                ascii_font = ImageFont.truetype(fp, font_size)
+                break
+            except Exception:
+                continue
+        if ascii_font is None:
+            ascii_font = ImageFont.load_default()
+
+        # 加载 CJK 字体
+        cjk_font_paths = [
+            "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+            "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+            "/System/Library/Fonts/PingFang.ttc",
+            "C:/Windows/fonts/msyh.ttc",
+            "C:/Windows/fonts/simsun.ttc",
+        ]
+        cjk_font = None
+        for fp in cjk_font_paths:
+            try:
+                cjk_font = ImageFont.truetype(fp, font_size)
+                break
+            except Exception:
+                continue
+
+        if cjk_font is None:
+            raise RuntimeError("No CJK font found")
+
+        def _measure(font: ImageFont.FreeTypeFont, ch: str) -> int:
+            bbox = font.getbbox(ch)
+            return bbox[2] - bbox[0] if bbox else font_size
+
+        # 计算列宽：确保 CJK（占 2 列）能放下
+        max_ascii_w = 1
+        max_cjk_w = 1
+        for line in lines:
+            for ch in line:
+                if _has_cjk(ch):
+                    max_cjk_w = max(max_cjk_w, _measure(cjk_font, ch))
+                else:
+                    max_ascii_w = max(max_ascii_w, _measure(ascii_font, ch))
+        col_width = max(max_ascii_w, (max_cjk_w + 1) // 2 + 1)
+
+        # 计算图片尺寸
+        max_cols = 0
+        for line in lines:
+            cols = sum(2 if _has_cjk(ch) else 1 for ch in line)
+            max_cols = max(max_cols, cols)
+
+        line_height = int(font_size * 1.5)
+        img_width = max_cols * col_width + padding * 2
+        img_height = len(lines) * line_height + padding * 2
+
+        img = Image.new("RGB", (img_width, img_height), bg_color)
+        draw = ImageDraw.Draw(img)
+
+        for row, line in enumerate(lines):
+            y = padding + row * line_height
+            col = 0
+            for ch in line:
+                x = padding + col * col_width
+                if _has_cjk(ch):
+                    w = _measure(cjk_font, ch)
+                    cx = x + col_width - w // 2
+                    draw.text((cx, y), ch, font=cjk_font, fill=fg_color)
+                    col += 2
+                else:
+                    w = _measure(ascii_font, ch)
+                    cx = x + (col_width - w) // 2
+                    draw.text((cx, y), ch, font=ascii_font, fill=fg_color)
+                    col += 1
+
+        buf = BytesIO()
+        img.save(buf, format="PNG")
+        buf.seek(0)
+
+        figure_style = _get_style_name(
+            doc, style_map.get("figure_paragraph", style_map["body"]), style_map["body"]
+        )
+        p = doc.add_paragraph(style=figure_style)
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = p.add_run()
+        width_cm = block.get("width_cm")
+        if width_cm is not None:
+            run.add_picture(buf, width=Cm(float(width_cm)))
+        else:
+            run.add_picture(buf)
+
+        if block.get("caption"):
+            caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+            cp = doc.add_paragraph(str(block["caption"]), style=caption_style)
+            cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        body_style = _get_style_name(doc, style_map["body"], "Normal")
+        doc.add_paragraph("", style=body_style)
+        return
+
+    except Exception:
+        # Pillow 双字体渲染失败，降级为 Word 文本渲染
+        _render_ascii_as_text(doc, block, style_map, lines)
+
+
+def _render_ascii_as_text(
+    doc: Any, block: Dict[str, Any], style_map: Dict[str, str], lines: List[str]
+) -> None:
+    """在 Word 中用等宽文本段落渲染 ASCII 图。"""
+    from docx.oxml import OxmlElement
+    from docx.shared import Pt
+
+    font_size = int(block.get("font_size", 10))
+    bg = block.get("bg_color", "#F8F8F8").lstrip("#")
+
+    # 创建一个居中的容器段落
+    figure_style = _get_style_name(
+        doc, style_map.get("figure_paragraph", style_map["body"]), style_map["body"]
+    )
+    container = doc.add_paragraph(style=figure_style)
+    container.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    # 添加灰色底纹的表格来包裹 ASCII 文本（保持对齐且美观）
+    table = doc.add_table(rows=len(lines), cols=1)
+    table.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    # 移除表格边框，设置背景色
+    tbl = table._tbl
+    tbl_pr = tbl.tblPr if tbl.tblPr is not None else OxmlElement("w:tblPr")
+
+    # 设置表格宽度（使用 width_cm 或自动）
+    width_cm = block.get("width_cm")
+    if width_cm is not None:
+        tbl_w = OxmlElement("w:tblW")
+        tbl_w.set(qn("w:w"), str(int(float(width_cm) * 567)))
+        tbl_w.set(qn("w:type"), "dxa")
+        tbl_pr.append(tbl_w)
+
+    # 设置表格背景色
+    shading = OxmlElement("w:shd")
+    shading.set(qn("w:val"), "clear")
+    shading.set(qn("w:color"), "auto")
+    shading.set(qn("w:fill"), bg)
+    tbl_pr.append(shading)
+
+    # 移除边框
+    borders = OxmlElement("w:tblBorders")
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        element = OxmlElement(f"w:{edge}")
+        element.set(qn("w:val"), "none")
+        element.set(qn("w:sz"), "0")
+        element.set(qn("w:space"), "0")
+        element.set(qn("w:color"), "auto")
+        borders.append(element)
+    tbl_pr.append(borders)
+
+    for idx, line in enumerate(lines):
+        cell = table.cell(idx, 0)
+        cell.text = ""
+        p = cell.paragraphs[0]
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        run = p.add_run(line)
+        run.font.size = Pt(font_size)
+
+        # 手动完整设置 rFonts，避免样式冲突
+        rpr = run._element.get_or_add_rPr()
+        for existing in list(rpr.findall(qn("w:rFonts"))):
+            rpr.remove(existing)
+        rFonts = OxmlElement("w:rFonts")
+        rFonts.set(qn("w:ascii"), "Courier New")
+        rFonts.set(qn("w:hAnsi"), "Courier New")
+        rFonts.set(qn("w:eastAsia"), "SimSun")
+        rFonts.set(qn("w:cs"), "Courier New")
+        rpr.insert(0, rFonts)
+
+        # 设置语言属性，确保 Word 识别为中文并启用东亚字体
+        for existing in list(rpr.findall(qn("w:lang"))):
+            rpr.remove(existing)
+        lang = OxmlElement("w:lang")
+        lang.set(qn("w:val"), "en-US")
+        lang.set(qn("w:eastAsia"), "zh-CN")
+        rpr.append(lang)
+
+    # caption（可选）
+    if block.get("caption"):
+        caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+        cp = doc.add_paragraph(str(block["caption"]), style=caption_style)
+        cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    body_style = _get_style_name(doc, style_map["body"], "Normal")
+    doc.add_paragraph("", style=body_style)
+
+
 def add_columns_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
     count = int(block["count"])
     columns = block["columns"]
@@ -552,4 +892,5 @@ def create_default_registry() -> BlockRegistry:
     registry.register("code_block", add_code_block_block)
     registry.register("formula", add_formula_block)
     registry.register("columns", add_columns_block)
+    registry.register("ascii_diagram", add_ascii_diagram_block)
     return registry

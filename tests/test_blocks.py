@@ -233,6 +233,21 @@ def test_p3_blocks_in_registry():
     assert "code_block" in registry._renderers
     assert "formula" in registry._renderers
     assert "columns" in registry._renderers
+    assert "ascii_diagram" in registry._renderers
+
+
+def test_ascii_diagram_block(subdoc, style_map, registry):
+    block = {
+        "type": "ascii_diagram",
+        "ascii": "  +---+\n  | A |\n  +---+",
+        "caption": "图1 架构示意",
+        "font_size": 12,
+    }
+    registry.render(subdoc, block, style_map)
+    # 验证有段落（图片段落 + caption + 空段落）
+    assert len(subdoc.paragraphs) >= 2
+    # 验证 caption 存在
+    assert any("架构示意" in p.text for p in subdoc.paragraphs)
 
 
 def test_style_map_override_heading(subdoc, style_map, registry):

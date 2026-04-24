@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is **report-engine**, a Python library for generating `.docx` Word reports from structured JSON payloads using `docxtpl` + `python-docx`. The core design principle is: **the template owns styles/layout, the payload owns content structure, and complex rich text is rendered via subdocs** (not shoved into the main template). There are 18 supported block types (heading, paragraph, rich_paragraph, bullet_list, numbered_list, table, image, page_break, note, quote, two_images_row, appendix_table, checklist, horizontal_rule, toc_placeholder, code_block, formula, columns).
+This is **report-engine**, a Python library for generating `.docx` Word reports from structured JSON payloads using `docxtpl` + `python-docx`. The core design principle is: **the template owns styles/layout, the payload owns content structure, and complex rich text is rendered via subdocs** (not shoved into the main template). There are 19 supported block types (heading, paragraph, rich_paragraph, bullet_list, numbered_list, table, image, page_break, note, quote, two_images_row, appendix_table, checklist, horizontal_rule, toc_placeholder, code_block, formula, ascii_diagram, columns).
 
 ## Development Commands
 
