@@ -32,3 +32,27 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
+
+/* BlockNote dark theme overrides */
+.bn-container {
+  --bn-colors-editor-background: #141415 !important;
+  --bn-colors-menu-text: #E8E8ED !important;
+  --bn-colors-tooltip-background: #1a1a1c !important;
+  --bn-colors-hovered-background: rgba(255, 255, 255, 0.04) !important;
+  --bn-colors-selected-background: rgba(91, 108, 240, 0.12) !important;
+  --bn-font-family: "Inter", system-ui, sans-serif !important;
+}
+
+.bn-editor {
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+}
+
+.bn-block-outer:not(:first-child) {
+  margin-top: 2px !important;
+}
+
+/* Placeholder text */
+.bn-inline-content[data-is-empty="true"]::before {
+  color: rgba(255, 255, 255, 0.25) !important;
+}
