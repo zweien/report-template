@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is **report-engine**, a Python library for generating `.docx` Word reports from structured JSON payloads using `docxtpl` + `python-docx`. The core design principle is: **the template owns styles/layout, the payload owns content structure, and complex rich text is rendered via subdocs** (not shoved into the main template). There are 19 supported block types (heading, paragraph, rich_paragraph, bullet_list, numbered_list, table, image, page_break, note, quote, two_images_row, appendix_table, checklist, horizontal_rule, toc_placeholder, code_block, formula, ascii_diagram, columns).
+This is **report-engine**, a Python library for generating `.docx` Word reports from structured JSON payloads using `docxtpl` + `python-docx`. The core design principle is: **the template owns styles/layout, the payload owns content structure, and complex rich text is rendered via subdocs** (not shoved into the main template). There are 20 supported block types (heading, paragraph, rich_paragraph, bullet_list, numbered_list, table, three_line_table, image, page_break, note, quote, two_images_row, appendix_table, checklist, horizontal_rule, toc_placeholder, code_block, formula, ascii_diagram, columns).
 
 ## Development Commands
 
@@ -53,7 +53,7 @@ report-engine render \
 | `validator.py` | Runtime payload validation: schema, block required fields, duplicates, image existence |
 | `style_checker.py` | Verify template contains required styles (`Heading 2`, `Body Text`, `ResearchTable`, etc.) with correct types |
 | `template_checker.py` | Verify template XML contains all placeholders (`RESEARCH_CONTENT_SUBDOC`) and Jinja flags (`ENABLE_RESEARCH_CONTENT`) declared by payload |
-| `blocks.py` | `BlockRegistry` + 18 block renderers. Each renderer takes a `doc` (or subdoc/cell), a block dict, and a `style_map`, and mutates the document in place. |
+| `blocks.py` | `BlockRegistry` + 19 block renderers. Each renderer takes a `doc` (or subdoc/cell), a block dict, and a `style_map`, and mutates the document in place. |
 | `subdoc.py` | `build_subdoc(tpl, blocks, style_map)` — creates a new subdoc, optionally prepends a title heading, then renders all blocks sequentially |
 | `renderer.py` | Main `render_report()` orchestrator and legacy `render_grant_advanced()` wrapper |
 | `cli.py` | `argparse` subcommands: `validate`, `check-template`, `render` |
@@ -115,7 +115,19 @@ Tests are in `tests/` and use `pytest`. `conftest.py` provides:
 - `advanced_payload` — a full advanced payload dict
 - `tpl` — `DocxTemplate(minimal_template)`
 
-To add a new block type: register a renderer in `blocks.py`, add required fields to `validator.BLOCK_REQUIRED_FIELDS`, and add tests in `tests/test_blocks.py`.
+To add a new block type:
+
+1. **`blocks.py`** — implement the renderer function and register it in `create_default_registry()`.
+2. **`validator.py`** — add required fields to `BLOCK_REQUIRED_FIELDS`.
+3. **`tests/test_blocks.py`** — add unit tests for the new block.
+4. **`docs/report_engine_payload_spec.md`** — document the block schema and fields.
+5. **`docs/report_engine_template_spec.md`** — update style usage if the block needs a new or shared style.
+6. **`style_checker.py`** — add any new required style to `STYLE_TYPE_REQUIREMENTS`.
+7. **`README.md`** — add the block to the supported block types table.
+8. **`data/examples/test_all_blocks.json`** — add an instance to the full block test payload.
+9. Regenerate `templates/test_all_blocks.docx` with `scripts/build_test_template.py`.
+10. Render and verify: `report-engine render --template templates/test_all_blocks.docx --payload data/examples/test_all_blocks.json --output output/test_all_blocks.docx`.
+11. Run `pytest` to confirm all tests pass.
 
 ## Development Workflow
 

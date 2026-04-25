@@ -14,6 +14,7 @@ BLOCK_REQUIRED_FIELDS = {
     "bullet_list": ["items"],
     "numbered_list": ["items"],
     "table": ["headers", "rows"],
+    "three_line_table": ["headers", "rows"],
     "image": ["path"],
     "page_break": [],
     # P1

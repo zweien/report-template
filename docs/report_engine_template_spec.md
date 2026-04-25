@@ -231,7 +231,7 @@ Phase 1 当前的 checker 已兼容这种策略：
 
 | 样式名 | 用途 | 使用的 block 类型 |
 |--------|------|-------------------|
-| `ResearchTable` | 研究表格（默认） | `table` |
+| `ResearchTable` | 研究表格（默认） | `table`、`three_line_table` |
 | `AppendixTable` | 附录表格（可选） | `appendix_table`（fallback 到 ResearchTable） |
 
 ### 其他样式（2 种，可选）
@@ -319,7 +319,7 @@ report-engine validate --payload data/examples/grant_advanced_demo.json
 report-engine check-template --template templates/grant/template.docx --payload data/examples/grant_advanced_demo.json
 report-engine render --template templates/grant/template.docx --payload data/examples/grant_advanced_demo.json --output output/demo.docx
 
-# 全量 block 类型测试（18 种）
+# 全量 block 类型测试（19 种）
 report-engine validate --payload data/examples/test_all_blocks.json
 report-engine render --template templates/test_all_blocks.docx --payload data/examples/test_all_blocks.json --output output/test_all_blocks.docx
 ```

@@ -371,3 +371,134 @@ def test_columns_block_gap_cm(subdoc, style_map, registry):
     spacing = tbl_pr.find(qn("w:tblCellSpacing"))
     assert spacing is not None
     assert spacing.get(qn("w:w")) == "567"  # 1 cm = 567 twips
+
+
+def test_three_line_table_block(subdoc, style_map, registry):
+    from docx.oxml.ns import qn
+    block = {
+        "type": "three_line_table",
+        "title": "表1 示例三线表",
+        "headers": ["A", "B"],
+        "rows": [["1", "2"], ["3", "4"]],
+    }
+    registry.render(subdoc, block, style_map)
+    assert len(subdoc.tables) == 1
+    table = subdoc.tables[0]
+    assert len(table.rows) == 3  # header + 2 data rows
+    assert table.rows[0].cells[0].text == "A"
+    assert table.rows[1].cells[0].text == "1"
+    assert table.rows[2].cells[1].text == "4"
+
+    # 验证 caption
+    assert any("示例三线表" in p.text for p in subdoc.paragraphs)
+
+
+def test_three_line_table_borders(subdoc, style_map, registry):
+    from docx.oxml.ns import qn
+    block = {
+        "type": "three_line_table",
+        "headers": ["H1", "H2"],
+        "rows": [["D1", "D2"]],
+    }
+    registry.render(subdoc, block, style_map)
+    table = subdoc.tables[0]
+    rows = list(table.rows)
+
+    def _get_border_sz(cell, edge):
+        tc = cell._tc
+        tcPr = tc.tcPr
+        if tcPr is None:
+            return None
+        tcBorders = tcPr.find(qn("w:tcBorders"))
+        if tcBorders is None:
+            return None
+        element = tcBorders.find(qn(f"w:{edge}"))
+        if element is None:
+            return None
+        return element.get(qn("w:sz"))
+
+    def _get_border_val(cell, edge):
+        tc = cell._tc
+        tcPr = tc.tcPr
+        if tcPr is None:
+            return None
+        tcBorders = tcPr.find(qn("w:tcBorders"))
+        if tcBorders is None:
+            return None
+        element = tcBorders.find(qn(f"w:{edge}"))
+        if element is None:
+            return None
+        return element.get(qn("w:val"))
+
+    # 第一行：top 粗线(12), bottom 细线(4), left/right none
+    for cell in rows[0].cells:
+        assert _get_border_val(cell, "top") == "single"
+        assert _get_border_sz(cell, "top") == "12"
+        assert _get_border_val(cell, "bottom") == "single"
+        assert _get_border_sz(cell, "bottom") == "4"
+        assert _get_border_val(cell, "left") == "none"
+        assert _get_border_val(cell, "right") == "none"
+
+    # 最后一行：bottom 粗线(12), top none, left/right none
+    for cell in rows[-1].cells:
+        assert _get_border_val(cell, "bottom") == "single"
+        assert _get_border_sz(cell, "bottom") == "12"
+        assert _get_border_val(cell, "top") == "none"
+        assert _get_border_val(cell, "left") == "none"
+        assert _get_border_val(cell, "right") == "none"
+
+
+def test_three_line_table_single_row(subdoc, style_map, registry):
+    """只有表头一行时，顶线和底线都应是粗线，表头底线不需要单独显示。"""
+    from docx.oxml.ns import qn
+    block = {
+        "type": "three_line_table",
+        "headers": ["H1"],
+        "rows": [],
+    }
+    registry.render(subdoc, block, style_map)
+    table = subdoc.tables[0]
+    rows = list(table.rows)
+    assert len(rows) == 1
+
+    def _get_border_sz(cell, edge):
+        tc = cell._tc
+        tcPr = tc.tcPr
+        if tcPr is None:
+            return None
+        tcBorders = tcPr.find(qn("w:tcBorders"))
+        if tcBorders is None:
+            return None
+        element = tcBorders.find(qn(f"w:{edge}"))
+        if element is None:
+            return None
+        return element.get(qn("w:sz"))
+
+    def _get_border_val(cell, edge):
+        tc = cell._tc
+        tcPr = tc.tcPr
+        if tcPr is None:
+            return None
+        tcBorders = tcPr.find(qn("w:tcBorders"))
+        if tcBorders is None:
+            return None
+        element = tcBorders.find(qn(f"w:{edge}"))
+        if element is None:
+            return None
+        return element.get(qn("w:val"))
+
+    for cell in rows[0].cells:
+        # 单行时，第一行既是表头又是最后一行
+        # top 粗线
+        assert _get_border_val(cell, "top") == "single"
+        assert _get_border_sz(cell, "top") == "12"
+        # bottom 粗线（因为没有数据行，表头底线不需要单独设置）
+        assert _get_border_val(cell, "bottom") == "single"
+        assert _get_border_sz(cell, "bottom") == "12"
+        assert _get_border_val(cell, "left") == "none"
+        assert _get_border_val(cell, "right") == "none"
+
+
+def test_three_line_table_in_registry():
+    registry = create_default_registry()
+    assert "three_line_table" in registry._renderers

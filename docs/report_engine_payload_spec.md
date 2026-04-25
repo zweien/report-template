@@ -202,7 +202,7 @@ Phase 1 推荐 payload 结构如下：
 
 ## 8. block 类型
 
-Phase 1 当前支持以下 block：
+Phase 1 当前支持以下 19 种 block：
 
 ### `heading`
 
@@ -240,6 +240,29 @@ Phase 1 当前支持以下 block：
   "force_borders": true
 }
 ```
+
+### `three_line_table`
+
+学术三线表，顶线与底线为粗线（1.5pt），表头底线为细线（0.5pt），无竖线、无中间横线。适用于论文、报告中的规范表格。
+
+```json
+{
+  "type": "three_line_table",
+  "title": "表2 实验结果",
+  "headers": ["实验组", "样本量", "均值", "标准差"],
+  "rows": [
+    ["对照组", "50", "10.25", "1.34"],
+    ["实验组", "50", "15.67", "1.89"]
+  ]
+}
+```
+
+**字段说明：**
+
+- `headers`（必填）：表头字符串数组
+- `rows`（必填）：二维数据数组
+- `title`（可选）：表格标题
+- `style`（可选）：Word 表格样式名，默认 `ResearchTable`
 
 ### `image`
 

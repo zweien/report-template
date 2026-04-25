@@ -6,7 +6,7 @@
 
 Phase 1 已完成，Phase 1.5（Block 扩展）也已全部落地。
 
-当前状态：**18 种 block 类型全部实现，50 个测试通过，端到端渲染可用。**
+当前状态：**19 种 block 类型全部实现，67 个测试通过，端到端渲染可用。**
 
 ## 已完成内容
 
@@ -21,14 +21,14 @@ Phase 1 已完成，Phase 1.5（Block 扩展）也已全部落地。
 
 - payload schema（Pydantic）
 - compat 归一化
-- validator（含 18 种 block 字段校验）
-- block registry（18 种 renderer）
+- validator（含 19 种 block 字段校验）
+- block registry（19 种 renderer）
 - subdoc builder
 - renderer
 - style checker
 - template checker
 
-### Block 类型（18 种）
+### Block 类型（19 种）
 
 | 批次 | 类型 |
 |------|------|
@@ -36,12 +36,13 @@ Phase 1 已完成，Phase 1.5（Block 扩展）也已全部落地。
 | P1（4 种） | rich_paragraph、note、quote、two_images_row |
 | P2（3 种） | appendix_table、checklist、horizontal_rule |
 | P3（4 种） | toc_placeholder、code_block、formula、columns |
+| P4（1 种） | three_line_table |
 
 ### 配套资源
 
 - `data/examples/` 示例 payload（含全量 block 测试用例）
 - `templates/test_all_blocks.docx` 全量测试模板
-- `tests/` 50 个测试
+- `tests/` 67 个测试
 - `output/` 占位目录
 - `assets/` 占位目录
 - README、排查文档、规范文档

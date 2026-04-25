@@ -80,6 +80,58 @@ def _set_table_borders(table: Any) -> None:
         element.set(qn("w:color"), "000000")
 
 
+def _set_three_line_table_borders(table: Any) -> None:
+    """设置学术三线表边框：顶线粗、表头底线细、表格底线粗，无竖线无中间横线。"""
+    rows = list(table.rows)
+    if not rows:
+        return
+
+    THICK = "12"  # 1.5pt
+    THIN = "4"    # 0.5pt
+
+    for row_idx, row in enumerate(rows):
+        for cell in row.cells:
+            tc = cell._tc
+            tcPr = tc.tcPr if tc.tcPr is not None else OxmlElement("w:tcPr")
+
+            tcBorders = tcPr.find(qn("w:tcBorders"))
+            if tcBorders is not None:
+                tcPr.remove(tcBorders)
+            tcBorders = OxmlElement("w:tcBorders")
+            tcPr.append(tcBorders)
+
+            for edge in ("top", "bottom", "left", "right"):
+                element = OxmlElement(f"w:{edge}")
+
+                if edge in ("left", "right"):
+                    element.set(qn("w:val"), "none")
+                    element.set(qn("w:sz"), "0")
+                elif edge == "top":
+                    if row_idx == 0:
+                        element.set(qn("w:val"), "single")
+                        element.set(qn("w:sz"), THICK)
+                    else:
+                        element.set(qn("w:val"), "none")
+                        element.set(qn("w:sz"), "0")
+                elif edge == "bottom":
+                    if row_idx == 0 and len(rows) > 1:
+                        element.set(qn("w:val"), "single")
+                        element.set(qn("w:sz"), THIN)
+                    elif row_idx == len(rows) - 1:
+                        element.set(qn("w:val"), "single")
+                        element.set(qn("w:sz"), THICK)
+                    else:
+                        element.set(qn("w:val"), "none")
+                        element.set(qn("w:sz"), "0")
+
+                element.set(qn("w:space"), "0")
+                element.set(qn("w:color"), "000000")
+                tcBorders.append(element)
+
+            if tc.tcPr is None:
+                tc.append(tcPr)
+
+
 MATHML_NS = "http://www.w3.org/1998/Math/MathML"
 
 
@@ -232,6 +284,45 @@ def add_page_break_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, s
 
 def add_table_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
     _add_table_block_impl(doc, block, style_map, style_map["table"])
+
+
+def add_three_line_table_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    if block.get("title"):
+        caption_style = _get_style_name(doc, style_map.get("table_caption", "TableCaption"), "TableCaption")
+        doc.add_paragraph(str(block["title"]), style=caption_style)
+
+    headers = block["headers"]
+    rows = block["rows"]
+    table_style = block.get("style") or style_map["table"]
+    table_style = _get_style_name(doc, table_style, "Table Grid")
+
+    table = doc.add_table(rows=1, cols=len(headers))
+    table.style = table_style
+
+    hdr_cells = table.rows[0].cells
+    for i, header in enumerate(headers):
+        hdr_cells[i].text = "" if header is None else str(header)
+
+    for row in rows:
+        row_cells = table.add_row().cells
+        for i, value in enumerate(row):
+            row_cells[i].text = "" if value is None else str(value)
+
+    _set_three_line_table_borders(table)
+
+    # 设置表格单元格字体：小五号宋体，单倍行距
+    for row in table.rows:
+        for cell in row.cells:
+            for paragraph in cell.paragraphs:
+                paragraph.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
+                for run in paragraph.runs:
+                    run.font.size = Pt(9)
+                    rPr = run._element.get_or_add_rPr()
+                    rFonts = rPr.get_or_add_rFonts()
+                    rFonts.set(qn("w:eastAsia"), "宋体")
+
+    body_style = _get_style_name(doc, style_map["body"], "Normal")
+    doc.add_paragraph("", style=body_style)
 
 
 def add_image_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
@@ -894,6 +985,7 @@ def create_default_registry() -> BlockRegistry:
     registry.register("bullet_list", add_bullet_list_block)
     registry.register("numbered_list", add_numbered_list_block)
     registry.register("table", add_table_block)
+    registry.register("three_line_table", add_three_line_table_block)
     registry.register("image", add_image_block)
     registry.register("page_break", add_page_break_block)
     registry.register("rich_paragraph", add_rich_paragraph_block)

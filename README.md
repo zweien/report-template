@@ -44,7 +44,7 @@
 - examples 示例 payload
 - 第一批测试骨架
 
-当前支持的 block 类型（共 18 种）：
+当前支持的 block 类型（共 19 种）：
 
 | 类型 | 说明 |
 |------|------|
@@ -54,6 +54,7 @@
 | `bullet_list` | 无序列表 |
 | `numbered_list` | 有序列表 |
 | `table` | 表格（支持标题、样式、边框） |
+| `three_line_table` | 学术三线表（粗顶线/底线，细表头底线，无竖线） |
 | `image` | 图片（支持宽度、图题、图例） |
 | `page_break` | 分页符 |
 | `note` | 注释块（带"注："前缀） |
@@ -66,6 +67,7 @@
 | `code_block` | 代码块（等宽字体 + 灰底） |
 | `formula` | 公式（LaTeX 输入，三级降级） |
 | `columns` | 多列布局（嵌套 block） |
+| `ascii_diagram` | ASCII 示意图（渲染为图片） |
 
 ---
 

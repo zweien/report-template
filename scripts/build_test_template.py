@@ -1,4 +1,4 @@
-"""生成覆盖全部 18 种 block 类型的测试模板。
+"""生成覆盖全部 19 种 block 类型的测试模板。
 
 用法:
     python scripts/build_test_template.py

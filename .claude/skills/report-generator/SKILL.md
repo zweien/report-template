@@ -134,6 +134,7 @@ python <skill-path>/scripts/render_mermaid.py --input diagram.mmd --output outpu
 | 段落文字 | `paragraph` 或 `rich_paragraph` |
 | 要点列表 | `bullet_list` 或 `numbered_list` |
 | 数据表格 | `table` |
+| 学术三线表 | `three_line_table` |
 | 引用 | `quote` |
 | 注释说明 | `note` |
 | 图片 | `image` 或 `two_images_row` |
