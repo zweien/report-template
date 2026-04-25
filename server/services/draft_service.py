@@ -14,6 +14,7 @@ def generate_empty_sections(parsed_structure: dict) -> Dict[str, Any]:
                     "type": "heading",
                     "props": {"level": h.get("level", 1)},
                     "content": [{"type": "text", "text": h.get("text", "")}],
+                    "children": [],
                 })
             sections[section["id"]] = blocks
         else:
@@ -23,6 +24,7 @@ def generate_empty_sections(parsed_structure: dict) -> Dict[str, Any]:
                     "type": "heading",
                     "props": {"level": 1},
                     "content": [{"type": "text", "text": section.get("title", section["id"])}],
+                    "children": [],
                 }
             ]
     return sections
