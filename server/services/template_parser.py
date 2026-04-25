@@ -14,17 +14,20 @@ def _read_template_xml(template_path: str) -> str:
 
 def _extract_scalar_vars(xml: str) -> List[str]:
     pattern = r"\{\{\s*([A-Z_][A-Z0-9_]*)\b"
-    return sorted(set(re.findall(pattern, xml)))
+    seen = set()
+    return [v for v in re.findall(pattern, xml) if not (v in seen or seen.add(v))]
 
 
 def _extract_subdoc_placeholders(xml: str) -> List[str]:
     pattern = r"\{\{p\s+([A-Z_][A-Z0-9_]*)\s*\}\}"
-    return sorted(set(re.findall(pattern, xml)))
+    seen = set()
+    return [v for v in re.findall(pattern, xml) if not (v in seen or seen.add(v))]
 
 
 def _extract_flags(xml: str) -> List[str]:
     pattern = r"\{%p\s+if\s+([A-Z_][A-Z0-9_]*)\s*%\}"
-    return sorted(set(re.findall(pattern, xml)))
+    seen = set()
+    return [v for v in re.findall(pattern, xml) if not (v in seen or seen.add(v))]
 
 
 def _pair_flags_with_subdocs(flags, subdocs):

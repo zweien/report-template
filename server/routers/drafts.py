@@ -12,6 +12,19 @@ from server.services.auth_service import get_current_user
 from server.services.draft_service import generate_empty_context, generate_empty_sections
 from server.services.export_service import export_draft_to_docx
 
+
+def _order_sections(sections: dict, parsed_structure: dict) -> dict:
+    """Reorder sections dict to match template's original section order."""
+    template_order = [s["id"] for s in parsed_structure.get("sections", [])]
+    ordered = {}
+    for sid in template_order:
+        if sid in sections:
+            ordered[sid] = sections[sid]
+    for sid in sections:
+        if sid not in ordered:
+            ordered[sid] = sections[sid]
+    return ordered
+
 router = APIRouter(prefix="/api/drafts", tags=["drafts"])
 
 
@@ -98,12 +111,18 @@ def get_draft(
     )
     if not draft:
         raise HTTPException(404, "Draft not found")
+    tmpl = db.query(Template).filter(Template.id == draft.template_id).first()
+    ordered_sections = (
+        _order_sections(draft.sections, tmpl.parsed_structure)
+        if tmpl
+        else draft.sections
+    )
     return DraftResponse(
         id=draft.id,
         template_id=draft.template_id,
         title=draft.title,
         context=draft.context,
-        sections=draft.sections,
+        sections=ordered_sections,
         attachments=draft.attachments,
         status=draft.status,
         created_at=draft.created_at.isoformat(),
