@@ -4,7 +4,7 @@ import { useCreateBlockNote, SuggestionMenuController, getDefaultReactSlashMenuI
 import { BlockNoteView } from "@blocknote/shadcn";
 import { filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from "@blocknote/core/extensions";
 import "@blocknote/shadcn/style.css";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   engineToBlocknoteBlocks,
   type EngineBlock,
@@ -15,6 +15,8 @@ import api from "@/lib/api";
 interface SectionEditorProps {
   blocks: EngineBlock[];
   onChange: (blocks: any[]) => void;
+  scrollToBlockId?: string;
+  onScrolled?: () => void;
 }
 
 function isBlockNoteBlocks(blocks: EngineBlock[]): boolean {
@@ -41,7 +43,7 @@ function migrateMermaidBlocks(blocks: any[]): any[] {
   });
 }
 
-export default function SectionEditor({ blocks, onChange }: SectionEditorProps) {
+export default function SectionEditor({ blocks, onChange, scrollToBlockId, onScrolled }: SectionEditorProps) {
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
@@ -72,6 +74,22 @@ export default function SectionEditor({ blocks, onChange }: SectionEditorProps) 
       onChangeRef.current(editor.document);
     }, 100);
   }, [editor]);
+
+  // Scroll to a specific block after editor mounts
+  useEffect(() => {
+    if (!scrollToBlockId) return;
+    const timer = setTimeout(() => {
+      const el = document.querySelector(
+        `[data-id="${scrollToBlockId}"]`
+      ) as HTMLElement | null;
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        try { editor.setTextCursorPosition(scrollToBlockId, "start"); } catch {}
+      }
+      onScrolled?.();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [scrollToBlockId, editor, onScrolled]);
 
   const getSlashMenuItems = useCallback(
     async (query: string) => {

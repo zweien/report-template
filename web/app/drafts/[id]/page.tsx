@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useDraftStore } from "@/lib/stores/draft-store";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import SectionEditor from "@/components/editor/SectionEditor";
+import OutlinePanel from "@/components/editor/OutlinePanel";
 import CommandPalette from "@/components/CommandPalette";
 
 export default function EditorPage() {
@@ -27,6 +28,8 @@ export default function EditorPage() {
   } = useDraftStore();
   const [loading, setLoading] = useState(true);
   const [cmdOpen, setCmdOpen] = useState(false);
+  const [outlineOpen, setOutlineOpen] = useState(true);
+  const [scrollTargetBlockId, setScrollTargetBlockId] = useState<string | null>(null);
 
   // Auto-save: debounce 3 seconds after last edit
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -76,6 +79,20 @@ export default function EditorPage() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [save]);
+
+  const handleNavigateHeading = useCallback(
+    (sectionId: string, blockId: string) => {
+      if (sectionId !== activeSection) {
+        setActiveSection(sectionId);
+      }
+      setScrollTargetBlockId(blockId);
+    },
+    [activeSection, setActiveSection]
+  );
+
+  const handleScrolled = useCallback(() => {
+    setScrollTargetBlockId(null);
+  }, []);
 
   if (authLoading || loading || !draft) {
     return (
@@ -133,6 +150,20 @@ export default function EditorPage() {
             className="rounded-md bg-[#5B6CF0] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#5B6CF0]/90"
           >
             Export .docx
+          </button>
+          <button
+            onClick={() => setOutlineOpen((v) => !v)}
+            className={`rounded-md border px-2.5 py-1.5 text-xs transition-colors ${
+              outlineOpen
+                ? "border-[#5B6CF0]/40 text-[#5B6CF0]"
+                : "border-white/10 text-[#8B8B93] hover:bg-white/5"
+            }`}
+            title={outlineOpen ? "Hide outline" : "Show outline"}
+          >
+            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" />
+              <line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
+            </svg>
           </button>
         </div>
       </header>
@@ -223,10 +254,22 @@ export default function EditorPage() {
                   useDraftStore.getState().updateSection(activeSection, blocks);
                   scheduleAutoSave();
                 }}
+                scrollToBlockId={scrollTargetBlockId ?? undefined}
+                onScrolled={handleScrolled}
               />
             )}
           </div>
         </main>
+
+        {/* Outline panel */}
+        {outlineOpen && (
+          <OutlinePanel
+            sections={draft.sections}
+            sectionEnabled={draft.section_enabled}
+            activeSection={activeSection}
+            onNavigateHeading={handleNavigateHeading}
+          />
+        )}
       </div>
 
       <CommandPalette commands={commands} open={cmdOpen} onClose={() => setCmdOpen(false)} />
