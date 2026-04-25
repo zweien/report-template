@@ -14,6 +14,57 @@ This is **report-engine**, a Python library for generating `.docx` Word reports 
 - Run single test: `pytest tests/test_blocks.py::test_heading_block -v`
 - CLI entry point after install: `report-engine --help`
 
+## Online Editor
+
+项目包含一个基于 BlockNote + Next.js 16 + FastAPI 的在线报告编辑器（`server/` + `web/`）。
+
+### 快速启动
+
+```bash
+# 安装所有依赖（后端 + 前端）
+bash scripts/editor.sh install
+
+# 启动前后端开发服务器
+bash scripts/editor.sh dev
+# 后端: http://localhost:8070
+# 前端: http://localhost:3070
+
+# 仅启动后端
+bash scripts/editor.sh backend
+
+# 仅启动前端
+bash scripts/editor.sh frontend
+```
+
+### 测试与检查
+
+```bash
+# 运行后端测试 (pytest)
+bash scripts/editor.sh test
+
+# API 集成测试（需后端运行中）
+bash scripts/editor.sh test-api
+
+# 前端类型检查
+bash scripts/editor.sh lint
+```
+
+### 其他命令
+
+```bash
+bash scripts/editor.sh status     # 检查服务状态
+bash scripts/editor.sh stop       # 停止所有服务
+bash scripts/editor.sh build      # 构建前端生产版本
+bash scripts/editor.sh clean      # 清理临时文件和缓存
+bash scripts/editor.sh reset-db   # 重置数据库
+```
+
+### 架构
+
+- **后端** (`server/`): FastAPI + SQLite，提供认证、模板上传解析、草稿 CRUD、.docx 导出
+- **前端** (`web/`): Next.js 16 + BlockNote + Zustand，分段编辑器，Linear 风格深色主题
+- **转换器**: BlockNote JSON ↔ report-engine payload 双向转换（`server/services/converter.py` + `web/lib/converter/`）
+
 ## CLI Usage
 
 ```bash
