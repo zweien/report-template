@@ -17,7 +17,8 @@ DEFAULT_STYLE_MAP = {
     "heading_4": "Heading 4",
     "heading_5": "Heading 5",
     "body": "Body Text",
-    "caption": "Caption",
+    "table_caption": "TableCaption",
+    "figure_caption": "FigureCaption",
     "legend": "Legend",
     "figure_paragraph": "Figure Paragraph",
     "table": "ResearchTable",
@@ -157,7 +158,7 @@ def _add_table_block_impl(
     default_style: str,
 ) -> None:
     if block.get("title"):
-        caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+        caption_style = _get_style_name(doc, style_map.get("table_caption", "TableCaption"), "TableCaption")
         doc.add_paragraph(str(block["title"]), style=caption_style)
 
     headers = block["headers"]
@@ -251,11 +252,9 @@ def add_image_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) 
         p.add_run(f"[图片缺失：{image_path}]")
 
     if block.get("caption"):
-        caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+        caption_style = _get_style_name(doc, style_map.get("figure_caption", "FigureCaption"), "FigureCaption")
         cp = doc.add_paragraph(str(block["caption"]), style=caption_style)
         cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cp.paragraph_format.space_before = Pt(0)
-        cp.paragraph_format.space_after = Pt(18)
 
     if block.get("legend"):
         legend_style = _get_style_name(doc, style_map["legend"], style_map["body"])
@@ -325,7 +324,7 @@ def add_two_images_row_block(doc: Any, block: Dict[str, Any], style_map: Dict[st
     tbl_pr.append(borders)
 
     figure_style = _get_style_name(doc, style_map["figure_paragraph"], style_map["body"])
-    caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+    caption_style = _get_style_name(doc, style_map.get("figure_caption", "FigureCaption"), "FigureCaption")
 
     for i, img in enumerate(images):
         cell = table.cell(0, i)
@@ -351,8 +350,6 @@ def add_two_images_row_block(doc: Any, block: Dict[str, Any], style_map: Dict[st
             caption_style_name = _get_style_name(doc, caption_style, style_map["body"])
             cp.style = doc.styles[caption_style_name]
             cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cp.paragraph_format.space_before = Pt(0)
-            cp.paragraph_format.space_after = Pt(18)
 
     body_style = _get_style_name(doc, style_map["body"], "Normal")
     doc.add_paragraph("", style=body_style)
@@ -503,7 +500,7 @@ def add_formula_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]
 
     # caption（可选）
     if block.get("caption"):
-        caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+        caption_style = _get_style_name(doc, style_map.get("figure_caption", "FigureCaption"), "Caption")
         cp = doc.add_paragraph(str(block["caption"]), style=caption_style)
         cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
@@ -632,7 +629,7 @@ def add_ascii_diagram_block(doc: Any, block: Dict[str, Any], style_map: Dict[str
 
             # caption
             if block.get("caption"):
-                caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+                caption_style = _get_style_name(doc, style_map.get("figure_caption", "FigureCaption"), "Caption")
                 cp = doc.add_paragraph(str(block["caption"]), style=caption_style)
                 cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
@@ -747,7 +744,7 @@ def add_ascii_diagram_block(doc: Any, block: Dict[str, Any], style_map: Dict[str
             run.add_picture(buf)
 
         if block.get("caption"):
-            caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+            caption_style = _get_style_name(doc, style_map.get("figure_caption", "FigureCaption"), "Caption")
             cp = doc.add_paragraph(str(block["caption"]), style=caption_style)
             cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
@@ -840,7 +837,7 @@ def _render_ascii_as_text(
 
     # caption（可选）
     if block.get("caption"):
-        caption_style = _get_style_name(doc, style_map["caption"], "Caption")
+        caption_style = _get_style_name(doc, style_map.get("figure_caption", "FigureCaption"), "Caption")
         cp = doc.add_paragraph(str(block["caption"]), style=caption_style)
         cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 

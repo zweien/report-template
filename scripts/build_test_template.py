@@ -153,15 +153,28 @@ def build_template(output_path: str):
 
     add_paragraph_style(doc, "Heading 4", bold=True)
     add_paragraph_style(doc, "Heading 5", bold=True)
-    # 表题 Caption：五号黑体，居中，段前18磅，段后0磅，行距最小值18磅
+    # 表题 TableCaption：五号黑体，居中，段前18磅，段后0磅，行距最小值18磅
     add_paragraph_style(
-        doc, "Caption",
+        doc, "TableCaption",
         font_size=Pt(10.5),
         bold=True,
         east_asia_font="黑体",
         alignment=WD_ALIGN_PARAGRAPH.CENTER,
         space_before=Pt(18),
         space_after=Pt(0),
+        line_spacing_rule=WD_LINE_SPACING.AT_LEAST,
+        line_spacing=Pt(18),
+    )
+
+    # 图题 FigureCaption：五号黑体，居中，段前0磅，段后18磅，行距最小值18磅
+    add_paragraph_style(
+        doc, "FigureCaption",
+        font_size=Pt(10.5),
+        bold=True,
+        east_asia_font="黑体",
+        alignment=WD_ALIGN_PARAGRAPH.CENTER,
+        space_before=Pt(0),
+        space_after=Pt(18),
         line_spacing_rule=WD_LINE_SPACING.AT_LEAST,
         line_spacing=Pt(18),
     )
