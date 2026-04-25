@@ -13,3 +13,6 @@ build/
 *.docx#
 
 output/
+
+# Server database
+data/editor.db
