@@ -208,6 +208,28 @@ def _normalize_blocks(blocks: List[dict]) -> List[dict]:
     return result
 
 
+def _strip_template_headings(blocks_data: list, section_meta: dict) -> list:
+    """Remove leading heading blocks that were imported from the template.
+
+    Template headings already exist in the template body before each subdoc
+    placeholder, so including them in the subdoc would cause duplicates.
+    """
+    th = section_meta.get("template_headings")
+    if not th:
+        return blocks_data
+    n = len(th)
+    # Count leading heading blocks
+    heading_count = 0
+    for b in blocks_data:
+        if b.get("type") == "heading":
+            heading_count += 1
+        else:
+            break
+    if heading_count >= n:
+        return blocks_data[n:]
+    return blocks_data
+
+
 def draft_to_payload(draft_data: dict, template_parsed_structure: dict) -> dict:
     """Convert a draft to a report-engine payload.
 
@@ -223,6 +245,7 @@ def draft_to_payload(draft_data: dict, template_parsed_structure: dict) -> dict:
         if _is_blocknote_blocks(blocks_data):
             blocks_data = convert_blocknote_blocks(blocks_data)
         blocks_data = _normalize_blocks(blocks_data)
+        blocks_data = _strip_template_headings(blocks_data, section_meta)
 
         sections.append({
             "id": section_id,
