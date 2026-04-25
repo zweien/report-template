@@ -386,35 +386,3 @@ payload 写法参考：
 
 这些测试的目标，是先把当前重构阶段的关键行为锁住，为后续继续开发提供回归保护。
 
----
-
-## 13. 当前限制
-
-- 更严格的运行级回归验证
-- 更多模板适配样例
-- 更完整的错误提示和日志输出
-- Phase 2 的 Agent Skill 封装
-
----
-
-## 14. 后续开发建议
-
-如果你要继续推进这个项目，建议按下面顺序：
-
-1. 先跑通 `pytest`
-2. 用真实模板跑一次 `check-template`
-3. 用真实模板和 example payload 跑一次 `render`
-4. 根据真实模板差异补充 style / placeholder / flag 约束
-5. 根据需要添加更多模板适配样例
-6. 推进 Phase 2 的 Agent Skill 封装
-
----
-
-## 15. 说明
-
-仓库中旧的“总提示词式交接文档”已经移除，不再作为实施依据。
-
-后续如需让 coding agent 或开发者继续推进，请直接以以下两份文档为准：
-
-- `docs/superpowers/plans/2026-04-23-report-engine-revised.md`
-- `docs/superpowers/specs/2026-04-23-report-engine-design.md`
