@@ -115,15 +115,17 @@ export function engineToBlocknoteBlocks(
         }));
         break;
 
-      case "image":
+      case "image": {
+        const path = block.path || "";
         result.push(bn("image", {
           props: {
-            url: block.path || "",
+            url: path.startsWith("/") ? path : "",
             width: block.width,
             caption: block.caption || "",
           },
         }));
         break;
+      }
 
       // page_break not supported by BlockNote, skip
 

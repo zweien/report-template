@@ -146,6 +146,8 @@ def convert_blocknote_blocks(blocks: List[dict]) -> List[dict]:
 
 def _normalize_blocks(blocks: List[dict]) -> List[dict]:
     """Adjust block formats from frontend storage to report-engine expectations."""
+    from server.config import UPLOADS_DIR
+
     result = []
     for block in blocks:
         b = dict(block)
@@ -155,6 +157,9 @@ def _normalize_blocks(blocks: List[dict]) -> List[dict]:
                 items.append({"text": str(text), "checked": bool(b["checked"][i]) if i < len(b["checked"]) else False})
             b["items"] = items
             b.pop("checked", None)
+        if b.get("type") == "image" and b.get("path", "").startswith("/api/upload/files/"):
+            filename = b["path"].rsplit("/", 1)[-1]
+            b["path"] = str(UPLOADS_DIR / filename)
         result.append(b)
     return result
 
