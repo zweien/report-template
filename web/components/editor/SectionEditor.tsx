@@ -9,6 +9,7 @@ import {
   type EngineBlock,
 } from "@/lib/converter/engine-to-blocknote";
 import { schema } from "@/lib/schema";
+import api from "@/lib/api";
 import MermaidCodeBlock from "./MermaidCodeBlock";
 
 interface SectionEditorProps {
@@ -38,7 +39,18 @@ export default function SectionEditor({ blocks, onChange }: SectionEditorProps) 
       : engineToBlocknoteBlocks(blocks)
     : undefined;
 
-  const editor = useCreateBlockNote({ schema, initialContent });
+  const editor = useCreateBlockNote({
+    schema,
+    initialContent,
+    uploadFile: async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      const { data } = await api.post("/upload/image", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return data.url;
+    },
+  });
 
   const handleEditorChange = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -53,6 +65,9 @@ export default function SectionEditor({ blocks, onChange }: SectionEditorProps) 
         editor={editor}
         onChange={handleEditorChange}
         theme="dark"
+        slashMenu
+        sideMenu
+        formattingToolbar
       />
       <MermaidCodeBlock editor={editor} />
     </div>

@@ -5,12 +5,51 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #3b82f6;
+  --accent: #f1f5f9;
+  --accent-foreground: #171717;
 }
 
 .dark {
   --background: #0A0A0B;
   --foreground: #E8E8ED;
+  --popover: #1a1a1c;
+  --popover-foreground: #E8E8ED;
+  --card: #1a1a1c;
+  --card-foreground: #E8E8ED;
+  --muted: #1e1e22;
+  --muted-foreground: #8b8b94;
+  --border: #2a2a2e;
+  --input: #2a2a2e;
+  --ring: #5b6cf0;
+  --accent: #1e1e22;
+  --accent-foreground: #E8E8ED;
 }
+
+/* Tailwind v4 JIT can't scan BlockNote's node_modules classes.
+   Provide shadcn/ui utility rules as plain CSS for BlockNote popups. */
+.bg-popover { background-color: var(--popover) !important; }
+.text-popover-foreground { color: var(--popover-foreground) !important; }
+.bg-card { background-color: var(--card) !important; }
+.text-card-foreground { color: var(--card-foreground) !important; }
+.bg-muted { background-color: var(--muted) !important; }
+.text-muted-foreground { color: var(--muted-foreground) !important; }
+.bg-background { background-color: var(--background) !important; }
+.text-foreground { color: var(--foreground) !important; }
+.border-border { border-color: var(--border) !important; }
+.border-input { border-color: var(--input) !important; }
+.bg-accent { background-color: var(--accent) !important; }
+.text-accent-foreground { color: var(--accent-foreground) !important; }
+.bg-input\/30 { background-color: color-mix(in srgb, var(--input) 30%) !important; }
+.bg-input\/50 { background-color: color-mix(in srgb, var(--input) 50%) !important; }
 
 body {
   background: var(--background);
@@ -37,10 +76,19 @@ body {
 .bn-container {
   --bn-colors-editor-background: #141415 !important;
   --bn-colors-menu-text: #E8E8ED !important;
+  --bn-colors-menu-background: #1a1a1c !important;
   --bn-colors-tooltip-background: #1a1a1c !important;
   --bn-colors-hovered-background: rgba(255, 255, 255, 0.04) !important;
   --bn-colors-selected-background: rgba(91, 108, 240, 0.12) !important;
   --bn-font-family: "Inter", system-ui, sans-serif !important;
+}
+
+/* BlockNote menus are portalled to body, set vars globally */
+.bn-root,
+.dark [data-radix-popper-content-wrapper] {
+  --bn-colors-menu-background: #1a1a1c !important;
+  --bn-colors-menu-text: #E8E8ED !important;
+  --bn-colors-tooltip-background: #1a1a1c !important;
 }
 
 .bn-editor {

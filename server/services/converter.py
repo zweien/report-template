@@ -87,9 +87,12 @@ def _convert_code_block(block: dict) -> dict:
 
 def _convert_image(block: dict) -> dict:
     props = block.get("props", {})
+    url = props.get("url", props.get("src", ""))
+    if not url:
+        return None
     return {
         "type": "image",
-        "path": props.get("url", props.get("src", "")),
+        "path": url,
         "width": props.get("width"),
         "caption": props.get("caption", ""),
     }
@@ -137,7 +140,20 @@ def convert_blocknote_blocks(blocks: List[dict]) -> List[dict]:
         elif block_type == "codeBlock":
             result.append(_convert_code_block(block))
         elif block_type == "image":
-            result.append(_convert_image(block))
+            converted = _convert_image(block)
+            if converted:
+                result.append(converted)
+        elif block_type == "divider":
+            result.append({"type": "horizontal_rule"})
+        elif block_type == "checkListItem":
+            items = []
+            checked = []
+            while i < len(blocks) and isinstance(blocks[i], dict) and blocks[i].get("type") == "checkListItem":
+                items.append(_extract_text(blocks[i].get("content", [])))
+                checked.append(blocks[i].get("props", {}).get("checked", False))
+                i += 1
+            result.append({"type": "checklist", "items": items, "checked": checked})
+            continue
         elif block_type == "pageBreak":
             result.append({"type": "page_break"})
         # Unsupported types silently ignored
@@ -145,6 +161,28 @@ def convert_blocknote_blocks(blocks: List[dict]) -> List[dict]:
         i += 1
 
     return result
+
+
+def _is_blocknote_blocks(blocks: List[dict]) -> bool:
+    """Check if blocks are stored in BlockNote editor format."""
+    if not blocks:
+        return False
+    return all(
+        isinstance(b, dict) and "id" in b and "type" in b and "children" in b
+        for b in blocks
+    )
+
+
+def _convert_checklist_blocks(blocks: List[dict]) -> List[dict]:
+    """Convert BlockNote checkListItem blocks to engine checklist."""
+    items = []
+    checked = []
+    for b in blocks:
+        if b.get("type") != "checkListItem":
+            break
+        items.append(_extract_text(b.get("content", [])))
+        checked.append(b.get("props", {}).get("checked", False))
+    return [{"type": "checklist", "items": items, "checked": checked}]
 
 
 def _normalize_blocks(blocks: List[dict]) -> List[dict]:
@@ -178,6 +216,8 @@ def draft_to_payload(draft_data: dict, template_parsed_structure: dict) -> dict:
     for section_meta in template_parsed_structure.get("sections", []):
         section_id = section_meta["id"]
         blocks_data = draft_data.get("sections", {}).get(section_id, [])
+        if _is_blocknote_blocks(blocks_data):
+            blocks_data = convert_blocknote_blocks(blocks_data)
         blocks_data = _normalize_blocks(blocks_data)
 
         sections.append({
@@ -198,10 +238,12 @@ def draft_to_payload(draft_data: dict, template_parsed_structure: dict) -> dict:
 
     bundle_meta = template_parsed_structure.get("attachments_bundle")
     if bundle_meta:
-        payload["attachments_bundle"] = {
-            "enabled": True,
-            "placeholder": bundle_meta["placeholder"],
-            "flag_name": bundle_meta["flag_name"],
-        }
+        section_placeholders = {s["placeholder"] for s in sections}
+        if bundle_meta["placeholder"] not in section_placeholders:
+            payload["attachments_bundle"] = {
+                "enabled": True,
+                "placeholder": bundle_meta["placeholder"],
+                "flag_name": bundle_meta["flag_name"],
+            }
 
     return payload
