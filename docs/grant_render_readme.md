@@ -39,7 +39,8 @@ python render_grant_demo.py
    - Heading 2
    - Heading 3
    - Body Text
-   - Caption
+   - TableCaption
+   - FigureCaption
    - Legend
    - Figure Paragraph
    - ResearchTable

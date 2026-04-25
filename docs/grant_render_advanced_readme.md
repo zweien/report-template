@@ -149,7 +149,8 @@ python render_grant_advanced.py
 - `Heading 2`
 - `Heading 3`
 - `Body Text`
-- `Caption`
+- `TableCaption`
+- `FigureCaption`
 - `Legend`
 - `Figure Paragraph`
 - `ResearchTable`

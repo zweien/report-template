@@ -218,7 +218,8 @@ Phase 1 当前的 checker 已兼容这种策略：
 | `Heading 2` | 二级标题 | `heading`（level ≤ 2） |
 | `Heading 3` | 三级标题 | `heading`（level > 2） |
 | `Body Text` | 正文 | `paragraph`、`rich_paragraph` 及各类 fallback |
-| `Caption` | 图表标题 | `table`、`image`、`formula` 的 title/caption |
+| `TableCaption` | 表题 | `table` 的 title |
+| `FigureCaption` | 图题 | `image`、`formula`、`ascii_diagram` 的 caption |
 | `Legend` | 图例说明 | `image` 的 legend |
 | `Figure Paragraph` | 图片段落 | `image`、`two_images_row` |
 | `List Bullet` | 无序列表 | `bullet_list` |
@@ -248,7 +249,7 @@ Phase 1 当前的 checker 已兼容这种策略：
 指定样式 → DEFAULT_STYLE_MAP 中的默认值 → "Normal"
 ```
 
-因此即使模板只预置了基础样式（Heading 2/3、Body Text、Caption），渲染也不会失败，只是视觉效果会降级。
+因此即使模板只预置了基础样式（Heading 2/3、Body Text、TableCaption、FigureCaption），渲染也不会失败，只是视觉效果会降级。
 
 ---
 
@@ -264,7 +265,8 @@ Phase 1 当前的 checker 已兼容这种策略：
 例如：
 
 - `ResearchTable` 必须是 table style
-- `Caption` 必须是 paragraph style
+- `TableCaption` 必须是 paragraph style
+- `FigureCaption` 必须是 paragraph style
 
 ### template checker
 
