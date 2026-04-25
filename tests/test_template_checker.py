@@ -14,7 +14,7 @@ def test_template_checker_reports_missing_section_placeholder(tmp_path, advanced
     from docx.enum.style import WD_STYLE_TYPE
 
     doc = Document()
-    for name in ["Heading 1", "Heading 2", "Heading 3", "Heading 4", "Heading 5", "Body Text", "Caption", "Legend", "Figure Paragraph", "List Bullet", "List Number"]:
+    for name in ["Heading 1", "Heading 2", "Heading 3", "Heading 4", "Heading 5", "Body Text", "TableCaption", "FigureCaption", "Legend", "Figure Paragraph", "List Bullet", "List Number"]:
         try:
             doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
         except ValueError:

@@ -133,7 +133,8 @@ report-engine render --template templates/generated.docx --payload data/examples
 | `Heading 2` | 二级标题 | ✅ |
 | `Heading 3` | 三级标题 | ✅ |
 | `Body Text` | 正文 | ✅ |
-| `Caption` | 图表标题 | ✅ |
+| `TableCaption` | 表题 | ✅ |
+| `FigureCaption` | 图题 | ✅ |
 | `Legend` | 图例 | ✅ |
 | `Figure Paragraph` | 图片段落 | ✅ |
 | `List Bullet` | 无序列表 | ✅ |

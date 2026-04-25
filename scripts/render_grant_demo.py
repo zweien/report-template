@@ -50,7 +50,7 @@ def add_bullet_list_block(doc, items: List[str]) -> None:
 
 def add_table_block(doc, block: Dict[str, Any]) -> None:
     if block.get("title"):
-        doc.add_paragraph(block["title"], style="Caption")
+        doc.add_paragraph(block["title"], style="TableCaption")
 
     headers = block["headers"]
     rows = block["rows"]
@@ -85,7 +85,7 @@ def add_image_block(doc, block: Dict[str, Any]) -> None:
         p.add_run(placeholder)
 
     if block.get("caption"):
-        cp = doc.add_paragraph(block["caption"], style="Caption")
+        cp = doc.add_paragraph(block["caption"], style="FigureCaption")
         cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     if block.get("legend"):

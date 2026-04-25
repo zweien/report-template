@@ -37,7 +37,8 @@
 - `Heading 2`
 - `Heading 3`
 - `Body Text`
-- `Caption`
+- `TableCaption`
+- `FigureCaption`
 - `Legend`
 - `Figure Paragraph`
 - `List Bullet`

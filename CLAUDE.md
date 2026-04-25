@@ -100,7 +100,7 @@ The codebase maintains backward compatibility with an older "basic" payload that
 ### Template Requirements
 
 A valid template must define:
-- **Paragraph styles**: `Heading 2`, `Heading 3`, `Body Text`, `Caption`, `Legend`, `Figure Paragraph`, `List Bullet`, `List Number`, `Note`, `Quote`, `CodeBlock`, `Checklist`
+- **Paragraph styles**: `Heading 2`, `Heading 3`, `Body Text`, `TableCaption`, `FigureCaption`, `Legend`, `Figure Paragraph`, `List Bullet`, `List Number`, `Note`, `Quote`, `CodeBlock`, `Checklist`
 - **Table styles**: `ResearchTable`, `AppendixTable` (optional, falls back to `ResearchTable`)
 - **Placeholder variables**: e.g. `{{PROJECT_NAME}}`, `{{p RESEARCH_CONTENT_SUBDOC }}`
 - **Jinja condition flags**: e.g. `{%p if ENABLE_RESEARCH_CONTENT %}`
