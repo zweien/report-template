@@ -3,10 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Callable, Dict
 
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK, WD_LINE_SPACING
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Cm
+from docx.shared import Cm, Pt
 from lxml import etree
 
 
@@ -180,6 +180,17 @@ def _add_table_block_impl(
     if block.get("force_borders", True):
         _set_table_borders(table)
 
+    # 设置表格单元格字体：小五号宋体，单倍行距
+    for row in table.rows:
+        for cell in row.cells:
+            for paragraph in cell.paragraphs:
+                paragraph.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
+                for run in paragraph.runs:
+                    run.font.size = Pt(9)
+                    rPr = run._element.get_or_add_rPr()
+                    rFonts = rPr.get_or_add_rFonts()
+                    rFonts.set(qn("w:eastAsia"), "宋体")
+
     body_style = _get_style_name(doc, style_map["body"], "Normal")
     doc.add_paragraph("", style=body_style)
 
@@ -243,6 +254,8 @@ def add_image_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) 
         caption_style = _get_style_name(doc, style_map["caption"], "Caption")
         cp = doc.add_paragraph(str(block["caption"]), style=caption_style)
         cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cp.paragraph_format.space_before = Pt(0)
+        cp.paragraph_format.space_after = Pt(18)
 
     if block.get("legend"):
         legend_style = _get_style_name(doc, style_map["legend"], style_map["body"])
@@ -338,6 +351,8 @@ def add_two_images_row_block(doc: Any, block: Dict[str, Any], style_map: Dict[st
             caption_style_name = _get_style_name(doc, caption_style, style_map["body"])
             cp.style = doc.styles[caption_style_name]
             cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cp.paragraph_format.space_before = Pt(0)
+            cp.paragraph_format.space_after = Pt(18)
 
     body_style = _get_style_name(doc, style_map["body"], "Normal")
     doc.add_paragraph("", style=body_style)

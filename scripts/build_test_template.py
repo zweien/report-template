@@ -153,7 +153,20 @@ def build_template(output_path: str):
 
     add_paragraph_style(doc, "Heading 4", bold=True)
     add_paragraph_style(doc, "Heading 5", bold=True)
-    add_paragraph_style(doc, "Caption", italic=True)
+    # 表题 Caption：五号黑体，居中，段前18磅，段后0磅，行距最小值18磅
+    add_paragraph_style(
+        doc, "Caption",
+        font_size=Pt(10.5),
+        bold=True,
+        east_asia_font="黑体",
+        alignment=WD_ALIGN_PARAGRAPH.CENTER,
+        space_before=Pt(18),
+        space_after=Pt(0),
+        line_spacing_rule=WD_LINE_SPACING.AT_LEAST,
+        line_spacing=Pt(18),
+    )
+
+    # 图注 Legend：保持默认（用户未明确要求格式）
     add_paragraph_style(doc, "Legend", italic=True)
     add_paragraph_style(doc, "Figure Paragraph")
     add_paragraph_style(doc, "List Bullet")
