@@ -128,9 +128,8 @@ export function engineToBlocknoteBlocks(
       }
 
       case "mermaid":
-        result.push(bn("codeBlock", {
-          props: { language: "mermaid" },
-          content: [{ type: "text", text: block.code || "" }],
+        result.push(bn("mermaidBlock", {
+          props: { code: block.code || "" },
         }));
         break;
 

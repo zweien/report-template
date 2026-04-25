@@ -1,11 +1,8 @@
-import { BlockNoteSchema, createCodeBlockSpec } from "@blocknote/core";
+import { BlockNoteSchema } from "@blocknote/core";
+import { MermaidBlockSpec } from "@/components/editor/MermaidBlock";
 
 export const schema = BlockNoteSchema.create().extend({
   blockSpecs: {
-    codeBlock: createCodeBlockSpec({
-      supportedLanguages: {
-        mermaid: { name: "Mermaid" },
-      },
-    }),
+    mermaidBlock: MermaidBlockSpec(),
   },
 });

@@ -987,23 +987,33 @@ def add_columns_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]
 
 def _render_mermaid_to_png(mermaid_code: str, output_path: Path) -> bool:
     """Render Mermaid code to PNG. Returns True on success."""
-    # Strategy 1: mmdc CLI
-    try:
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".mmd", delete=False) as f:
-            f.write(mermaid_code)
-            tmp_mmd = f.name
-        result = subprocess.run(
-            ["mmdc", "-i", tmp_mmd, "-o", str(output_path), "-b", "white", "-w", "1200"],
-            timeout=30,
-            capture_output=True,
-        )
-        Path(tmp_mmd).unlink(missing_ok=True)
-        if result.returncode == 0 and output_path.exists():
-            return True
-    except FileNotFoundError:
-        pass
-    except Exception as e:
-        logger.warning("mmdc rendering failed: %s", e)
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".mmd", delete=False) as f:
+        f.write(mermaid_code)
+        tmp_mmd = f.name
+
+    # Puppeteer config for headless environments (e.g. no sandbox)
+    puppeteer_config = Path(tempfile.mktemp(suffix=".json"))
+    puppeteer_config.write_text('{"args": ["--no-sandbox", "--disable-setuid-sandbox"]}')
+
+    # Strategy 1: mmdc CLI (direct or via npx)
+    for cmd in ["mmdc", "npx"]:
+        try:
+            args = [cmd] if cmd == "mmdc" else ["npx", "--yes", "@mermaid-js/mermaid-cli"]
+            args += [
+                "-i", tmp_mmd, "-o", str(output_path),
+                "-b", "white", "-w", "1200",
+                "-p", str(puppeteer_config),
+            ]
+            result = subprocess.run(args, timeout=60, capture_output=True)
+            if result.returncode == 0 and output_path.exists():
+                _cleanup_mermaid_tmp(tmp_mmd, puppeteer_config)
+                return True
+        except FileNotFoundError:
+            continue
+        except Exception as e:
+            logger.warning("%s rendering failed: %s", cmd, e)
+
+    _cleanup_mermaid_tmp(tmp_mmd, puppeteer_config)
 
     # Strategy 2: mermaid.ink API
     try:
@@ -1018,6 +1028,11 @@ def _render_mermaid_to_png(mermaid_code: str, output_path: Path) -> bool:
         logger.warning("mermaid.ink rendering failed: %s", e)
 
     return False
+
+
+def _cleanup_mermaid_tmp(*paths: Path) -> None:
+    for p in paths:
+        Path(p).unlink(missing_ok=True)
 
 
 def add_mermaid_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:

@@ -145,6 +145,9 @@ def convert_blocknote_blocks(blocks: List[dict]) -> List[dict]:
                 result.append(converted)
         elif block_type == "divider":
             result.append({"type": "horizontal_rule"})
+        elif block_type == "mermaidBlock":
+            code = block.get("props", {}).get("code", "")
+            result.append({"type": "mermaid", "code": code})
         elif block_type == "checkListItem":
             items = []
             checked = []
@@ -168,7 +171,7 @@ def _is_blocknote_blocks(blocks: List[dict]) -> bool:
     if not blocks:
         return False
     return all(
-        isinstance(b, dict) and "id" in b and "type" in b and "children" in b
+        isinstance(b, dict) and "id" in b and "type" in b
         for b in blocks
     )
 

@@ -111,6 +111,9 @@ function convertBlock(block: BlockNoteBlock): EngineBlock | null {
       return { type: "code_block", code: text };
     }
 
+    case "mermaidBlock":
+      return { type: "mermaid", code: block.props?.code || "" };
+
     case "divider":
       return { type: "horizontal_rule" };
 
