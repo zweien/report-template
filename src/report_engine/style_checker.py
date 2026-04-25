@@ -10,8 +10,11 @@ from report_engine.blocks import DEFAULT_STYLE_MAP
 
 
 STYLE_TYPE_REQUIREMENTS = {
+    "heading_1": WD_STYLE_TYPE.PARAGRAPH,
     "heading_2": WD_STYLE_TYPE.PARAGRAPH,
     "heading_3": WD_STYLE_TYPE.PARAGRAPH,
+    "heading_4": WD_STYLE_TYPE.PARAGRAPH,
+    "heading_5": WD_STYLE_TYPE.PARAGRAPH,
     "body": WD_STYLE_TYPE.PARAGRAPH,
     "caption": WD_STYLE_TYPE.PARAGRAPH,
     "legend": WD_STYLE_TYPE.PARAGRAPH,

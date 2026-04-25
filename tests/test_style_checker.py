@@ -7,8 +7,11 @@ from report_engine.style_checker import check_template_styles
 def _save_doc(tmp_path, *, include_table_style=True, wrong_table_type=False):
     doc = Document()
     for name in [
+        "Heading 1",
         "Heading 2",
         "Heading 3",
+        "Heading 4",
+        "Heading 5",
         "Body Text",
         "Caption",
         "Legend",

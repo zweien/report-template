@@ -11,8 +11,11 @@ from lxml import etree
 
 
 DEFAULT_STYLE_MAP = {
+    "heading_1": "Heading 1",
     "heading_2": "Heading 2",
     "heading_3": "Heading 3",
+    "heading_4": "Heading 4",
+    "heading_5": "Heading 5",
     "body": "Body Text",
     "caption": "Caption",
     "legend": "Legend",
@@ -183,10 +186,10 @@ def _add_table_block_impl(
 
 def add_heading_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
     level = int(block.get("level", 2))
-    if level <= 2:
-        style_name = _get_style_name(doc, style_map["heading_2"], "Heading 2")
-    else:
-        style_name = _get_style_name(doc, style_map["heading_3"], "Heading 3")
+    level = max(1, min(level, 5))
+    key = f"heading_{level}"
+    fallback = f"Heading {level}"
+    style_name = _get_style_name(doc, style_map.get(key, fallback), fallback)
     doc.add_paragraph(str(block["text"]), style=style_name)
 
 

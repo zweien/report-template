@@ -56,8 +56,11 @@ def build_template(output_path: str):
     doc = Document()
 
     # ── 段落样式 ──────────────────────────────────────────────
+    add_paragraph_style(doc, "Heading 1", bold=True)
     add_paragraph_style(doc, "Heading 2", bold=True)
     add_paragraph_style(doc, "Heading 3", bold=True)
+    add_paragraph_style(doc, "Heading 4", bold=True)
+    add_paragraph_style(doc, "Heading 5", bold=True)
     add_paragraph_style(doc, "Body Text")
     add_paragraph_style(doc, "Caption", italic=True)
     add_paragraph_style(doc, "Legend", italic=True)

@@ -17,13 +17,14 @@ import re
 from pathlib import Path
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
+from docx.shared import RGBColor
 
 
 # ── 样式定义 ──────────────────────────────────────────────────
 
 REQUIRED_PARAGRAPH_STYLES = [
-    ("Heading 2", {"bold": True}),
-    ("Heading 3", {"bold": True}),
+    ("Heading 2", {"bold": True, "color": "000000"}),
+    ("Heading 3", {"bold": True, "color": "000000"}),
     ("Body Text", {}),
     ("Caption", {"italic": True}),
     ("Legend", {"italic": True}),
@@ -65,17 +66,17 @@ def extract_structure(input_path: str) -> dict:
     for table in doc.tables:
         tables_count += 1
 
-    # 识别章节结构（基于 Heading 2，排除标题和附件）
+    # 识别章节结构（基于 Heading 1/2，排除标题和附件）
     sections = []
     title_keywords = ("项目", "申报", "报告", "申请书", "计划书", "开题", "结题")
     for h in headings:
-        if h["level"] == 2 and h["text"] not in ("附件", "附录", "附件区"):
-            # 跳过看起来像文档标题的 Heading 2
-            if any(kw in h["text"] for kw in title_keywords):
+        if h["level"] in (1, 2) and h["text"] not in ("附件", "附录", "附件区"):
+            # 跳过看起来像文档标题的 Heading 1/2
+            if h["level"] == 1 and any(kw in h["text"] for kw in title_keywords):
                 continue
             # 去掉中文数字前缀（如"二、"）
             title = re.sub(r"^[一二三四五六七八九十]+[、．.]\s*", "", h["text"])
-            sections.append(title)
+            sections.append({"title": title, "level": h["level"]})
 
     return {
         "headings": headings,
@@ -98,14 +99,16 @@ def generate_template_from_structure(structure: dict, output_path: str,
     for name, opts in REQUIRED_PARAGRAPH_STYLES:
         try:
             style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
-            if opts.get("bold"):
-                style.font.bold = True
-            if opts.get("italic"):
-                style.font.italic = True
-            if opts.get("font_name"):
-                style.font.name = opts["font_name"]
         except ValueError:
-            pass
+            style = doc.styles[name]
+        if opts.get("bold"):
+            style.font.bold = True
+        if opts.get("italic"):
+            style.font.italic = True
+        if opts.get("font_name"):
+            style.font.name = opts["font_name"]
+        if opts.get("color"):
+            style.font.color.rgb = RGBColor.from_string(opts["color"])
 
     for name in REQUIRED_TABLE_STYLES:
         try:
@@ -130,10 +133,12 @@ def generate_template_from_structure(structure: dict, output_path: str,
     # 章节
     chinese_nums = "一二三四五六七八九十"
     section_defs = []
-    for i, title in enumerate(structure["sections"][:10]):  # 最多 10 个章节
+    for i, sec in enumerate(structure["sections"][:10]):  # 最多 10 个章节
         prefix = f"SECTION_{i + 1}"
         num = chinese_nums[i] if i < len(chinese_nums) else str(i + 1)
-        section_defs.append((title, prefix, num))
+        title = sec["title"]
+        level = sec["level"]
+        section_defs.append((title, prefix, num, level))
         doc.add_paragraph(f"{{%p if ENABLE_{prefix} %}}")
         doc.add_paragraph(f"{num}、{title}")
         doc.add_paragraph(f"{{{{p {prefix}_SUBDOC }}}}")
@@ -179,16 +184,16 @@ def generate_payload_from_structure(structure: dict, section_defs: list,
         order += 1
 
     # 章节
-    for title, prefix, _ in section_defs:
+    for title, prefix, _, level in section_defs:
         sections.append({
             "id": prefix.lower(),
             "placeholder": f"{prefix}_SUBDOC",
             "flag_name": f"ENABLE_{prefix}",
             "enabled": True,
             "subdoc_title": title,
-            "subdoc_title_level": 2,
+            "subdoc_title_level": level,
             "blocks": [
-                {"type": "heading", "text": "（请填写小节标题）", "level": 2},
+                {"type": "heading", "text": "（请填写小节标题）", "level": level},
                 {"type": "paragraph", "text": "（请填写正文内容）"},
             ],
             "order": order,

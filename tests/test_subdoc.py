@@ -7,8 +7,11 @@ from report_engine.subdoc import build_subdoc
 @pytest.fixture
 def style_map():
     return {
+        "heading_1": "Heading 1",
         "heading_2": "Heading 2",
         "heading_3": "Heading 3",
+        "heading_4": "Heading 4",
+        "heading_5": "Heading 5",
         "body": "Body Text",
         "caption": "Caption",
         "legend": "Legend",

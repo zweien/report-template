@@ -19,14 +19,15 @@ import argparse
 from pathlib import Path
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
+from docx.shared import RGBColor
 
 
 # ── 样式定义 ──────────────────────────────────────────────────
 
 PARAGRAPH_STYLES = [
     # (name, options)
-    ("Heading 2", {"bold": True}),
-    ("Heading 3", {"bold": True}),
+    ("Heading 2", {"bold": True, "color": "000000"}),
+    ("Heading 3", {"bold": True, "color": "000000"}),
     ("Body Text", {}),
     ("Caption", {"italic": True}),
     ("Legend", {"italic": True}),
@@ -65,13 +66,15 @@ def add_styles(doc: Document):
         try:
             style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
         except ValueError:
-            continue
+            style = doc.styles[name]
         if opts.get("bold"):
             style.font.bold = True
         if opts.get("italic"):
             style.font.italic = True
         if opts.get("font_name"):
             style.font.name = opts["font_name"]
+        if opts.get("color"):
+            style.font.color.rgb = RGBColor.from_string(opts["color"])
 
     for name in TABLE_STYLES:
         try:

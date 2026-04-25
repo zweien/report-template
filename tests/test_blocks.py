@@ -15,8 +15,11 @@ def subdoc(tpl):
 @pytest.fixture
 def style_map():
     return {
+        "heading_1": "Heading 1",
         "heading_2": "Heading 2",
         "heading_3": "Heading 3",
+        "heading_4": "Heading 4",
+        "heading_5": "Heading 5",
         "body": "Body Text",
         "caption": "Caption",
         "legend": "Legend",
@@ -37,6 +40,23 @@ def test_heading_block(subdoc, style_map):
     registry = create_default_registry()
     registry.render(subdoc, {"type": "heading", "text": "标题", "level": 2}, style_map)
     assert subdoc.paragraphs[0].text == "标题"
+    assert subdoc.paragraphs[0].style.name == "Heading 2"
+
+
+def test_heading_block_levels(subdoc, style_map):
+    registry = create_default_registry()
+    for level in [1, 2, 3, 4, 5]:
+        registry.render(subdoc, {"type": "heading", "text": f"标题{level}", "level": level}, style_map)
+    for i, level in enumerate([1, 2, 3, 4, 5], start=0):
+        assert subdoc.paragraphs[i].style.name == f"Heading {level}"
+
+
+def test_heading_block_clamps_level(subdoc, style_map):
+    registry = create_default_registry()
+    registry.render(subdoc, {"type": "heading", "text": "太低", "level": 0}, style_map)
+    assert subdoc.paragraphs[0].style.name == "Heading 1"
+    registry.render(subdoc, {"type": "heading", "text": "太高", "level": 99}, style_map)
+    assert subdoc.paragraphs[1].style.name == "Heading 5"
 
 
 def test_paragraph_block(subdoc, style_map):
