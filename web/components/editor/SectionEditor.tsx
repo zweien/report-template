@@ -4,7 +4,7 @@ import { useCreateBlockNote, SuggestionMenuController, getDefaultReactSlashMenuI
 import { BlockNoteView } from "@blocknote/shadcn";
 import { filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from "@blocknote/core/extensions";
 import "@blocknote/shadcn/style.css";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import {
   engineToBlocknoteBlocks,
   type EngineBlock,
@@ -43,30 +43,23 @@ function migrateMermaidBlocks(blocks: any[]): any[] {
   });
 }
 
+function prepareBlocks(blocks: EngineBlock[]): any[] {
+  if (blocks.length === 0) return [];
+  const raw = isBlockNoteBlocks(blocks) ? blocks : engineToBlocknoteBlocks(blocks);
+  return migrateMermaidBlocks(raw).filter((b: any) => {
+    if (b.type === "image" && !b.props?.url) return false;
+    return true;
+  });
+}
+
 export default function SectionEditor({ blocks, onChange, scrollToBlockId, onScrolled }: SectionEditorProps) {
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const initialContent = useMemo(() => {
-    if (blocks.length === 0) return undefined;
-    try {
-      const raw = isBlockNoteBlocks(blocks) ? blocks : engineToBlocknoteBlocks(blocks);
-      const migrated = migrateMermaidBlocks(raw);
-      // Filter out blocks that BlockNote can't handle (e.g. image with empty URL)
-      return migrated.filter((b: any) => {
-        if (b.type === "image" && !b.props?.url) return false;
-        return true;
-      });
-    } catch {
-      return undefined;
-    }
-  }, []);
-
   const editor = useCreateBlockNote({
     schema,
-    initialContent,
     uploadFile: async (file: File) => {
       const formData = new FormData();
       formData.append("file", file);
@@ -76,6 +69,19 @@ export default function SectionEditor({ blocks, onChange, scrollToBlockId, onScr
       return data.url;
     },
   });
+
+  // Load content after mount via replaceBlocks so errors can be caught
+  const blocksLoadedRef = useRef(false);
+  useEffect(() => {
+    if (blocksLoadedRef.current) return;
+    blocksLoadedRef.current = true;
+    const prepared = prepareBlocks(blocks);
+    if (prepared.length > 0) {
+      try {
+        editor.replaceBlocks(editor.document, prepared);
+      } catch {}
+    }
+  }, [editor]);
 
   const handleEditorChange = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
