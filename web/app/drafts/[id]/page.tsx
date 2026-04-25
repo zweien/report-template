@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useDraftStore } from "@/lib/stores/draft-store";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import SectionEditor from "@/components/editor/SectionEditor";
 
 export default function EditorPage() {
   const params = useParams();
@@ -23,6 +24,24 @@ export default function EditorPage() {
     updateContext,
   } = useDraftStore();
   const [loading, setLoading] = useState(true);
+
+  // Auto-save: debounce 3 seconds after last edit
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const scheduleAutoSave = useCallback(() => {
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    autoSaveTimerRef.current = setTimeout(() => {
+      const { isDirty, save: doSave } = useDraftStore.getState();
+      if (isDirty) doSave();
+    }, 3000);
+  }, []);
+
+  // Cleanup auto-save timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     checkAuth();
@@ -149,11 +168,14 @@ export default function EditorPage() {
                 .replace(/_/g, " ")
                 .replace(/\b\w/g, (c) => c.toUpperCase())}
             </h2>
-            <div className="min-h-[400px] rounded-lg border border-white/[0.06] bg-[#141415] p-4">
-              <p className="text-sm text-[#8B8B93]">
-                BlockNote editor will be integrated here (Task 11)
-              </p>
-            </div>
+            <SectionEditor
+              key={activeSection}
+              blocks={draft.sections[activeSection] || []}
+              onChange={(blocks) => {
+                useDraftStore.getState().updateSection(activeSection, blocks);
+                scheduleAutoSave();
+              }}
+            />
           </div>
         </main>
       </div>
