@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useDraftStore } from "@/lib/stores/draft-store";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import SectionEditor from "@/components/editor/SectionEditor";
+import type { Payload } from "@/lib/stores/draft-store";
 import OutlinePanel from "@/components/editor/OutlinePanel";
 import CommandPalette from "@/components/CommandPalette";
 
@@ -25,6 +26,7 @@ export default function EditorPage() {
     updateTitle,
     updateContext,
     toggleSection,
+    importPayload,
   } = useDraftStore();
   const [loading, setLoading] = useState(true);
   const [cmdOpen, setCmdOpen] = useState(false);
@@ -94,6 +96,27 @@ export default function EditorPage() {
     setScrollTargetBlockId(null);
   }, []);
 
+  const importInputRef = useRef<HTMLInputElement>(null);
+  const handleImportPayload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const payload: Payload = JSON.parse(reader.result as string);
+          importPayload(payload);
+          scheduleAutoSave();
+        } catch {
+          alert("Invalid JSON file");
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    },
+    [importPayload, scheduleAutoSave]
+  );
+
   if (authLoading || loading || !draft) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -138,6 +161,19 @@ export default function EditorPage() {
             {saveStatus === "error" && "Save failed"}
             {saveStatus === "idle" && isDirty && "Unsaved changes"}
           </span>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={handleImportPayload}
+          />
+          <button
+            onClick={() => importInputRef.current?.click()}
+            className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-[#8B8B93] hover:bg-white/5"
+          >
+            Import
+          </button>
           <button
             onClick={save}
             disabled={!isDirty || saveStatus === "saving"}

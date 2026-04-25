@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import api from "@/lib/api";
+import { payloadToDraftSections } from "@/lib/converter/engine-to-blocknote";
 
 interface DraftData {
   id: string;
@@ -10,6 +11,19 @@ interface DraftData {
   attachments: Record<string, any[]>;
   section_enabled: Record<string, boolean>;
   status: string;
+}
+
+export interface PayloadSection {
+  id: string;
+  blocks: any[];
+  enabled?: boolean;
+  [key: string]: any;
+}
+
+export interface Payload {
+  context?: Record<string, string>;
+  sections?: PayloadSection[];
+  [key: string]: any;
 }
 
 interface DraftStore {
@@ -26,6 +40,7 @@ interface DraftStore {
   toggleSection: (id: string) => void;
   save: () => Promise<void>;
   exportDocx: () => Promise<void>;
+  importPayload: (payload: Payload) => void;
 }
 
 export const useDraftStore = create<DraftStore>((set, get) => ({
@@ -111,5 +126,45 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
     a.download = `${draft.title}.docx`;
     a.click();
     window.URL.revokeObjectURL(url);
+  },
+
+  importPayload: (payload: Payload) => {
+    const { draft } = get();
+    if (!draft) return;
+
+    const newSections = payloadToDraftSections(
+      payload,
+      draft.sections,
+      draft.section_enabled
+    );
+
+    const newContext: Record<string, string> = { ...draft.context };
+    if (payload.context) {
+      for (const [key, value] of Object.entries(payload.context)) {
+        if (key in newContext) {
+          newContext[key] = value;
+        }
+      }
+    }
+
+    const newSectionEnabled = { ...draft.section_enabled };
+    if (payload.sections) {
+      for (const sec of payload.sections) {
+        if (sec.id in newSectionEnabled && sec.enabled !== undefined) {
+          newSectionEnabled[sec.id] = sec.enabled;
+        }
+      }
+    }
+
+    set({
+      draft: {
+        ...draft,
+        sections: newSections,
+        context: newContext,
+        section_enabled: newSectionEnabled,
+      },
+      isDirty: true,
+      saveStatus: "idle",
+    });
   },
 }));

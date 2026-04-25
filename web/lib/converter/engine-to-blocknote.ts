@@ -182,3 +182,34 @@ function buildTableContent(
     })),
   };
 }
+
+/**
+ * Convert a report-engine payload into draft sections (BlockNote blocks).
+ *
+ * For each section in the payload whose id matches an existing draft section,
+ * the engine blocks are converted to BlockNote blocks and replace the draft
+ * section content. Sections not present in the payload are left untouched.
+ */
+export function payloadToDraftSections(
+  payload: { sections?: { id: string; blocks: EngineBlock[] }[] },
+  existingSections: Record<string, any[]>,
+  sectionEnabled: Record<string, boolean>
+): Record<string, any[]> {
+  const result: Record<string, any[]> = {};
+
+  // Keep existing sections that are not in the payload
+  for (const [id, blocks] of Object.entries(existingSections)) {
+    result[id] = blocks;
+  }
+
+  // Override with payload sections
+  if (payload.sections) {
+    for (const sec of payload.sections) {
+      if (sec.id in result) {
+        result[sec.id] = engineToBlocknoteBlocks(sec.blocks || []);
+      }
+    }
+  }
+
+  return result;
+}
