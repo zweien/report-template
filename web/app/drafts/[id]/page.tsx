@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useDraftStore } from "@/lib/stores/draft-store";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import SectionEditor from "@/components/editor/SectionEditor";
+import CommandPalette from "@/components/CommandPalette";
 
 export default function EditorPage() {
   const params = useParams();
@@ -24,6 +25,7 @@ export default function EditorPage() {
     updateContext,
   } = useDraftStore();
   const [loading, setLoading] = useState(true);
+  const [cmdOpen, setCmdOpen] = useState(false);
 
   // Auto-save: debounce 3 seconds after last edit
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -65,6 +67,10 @@ export default function EditorPage() {
         e.preventDefault();
         save();
       }
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setCmdOpen((v) => !v);
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -79,6 +85,16 @@ export default function EditorPage() {
   }
 
   const sectionIds = Object.keys(draft.sections);
+
+  const commands = [
+    { id: "save", label: "Save", shortcut: "⌘S", action: save },
+    { id: "export", label: "Export .docx", shortcut: "⌘⇧E", action: exportDocx },
+    ...sectionIds.map((id) => ({
+      id: `section-${id}`,
+      label: `Go to: ${id.replace(/_/g, " ")}`,
+      action: () => setActiveSection(id),
+    })),
+  ];
 
   return (
     <div className="flex h-screen flex-col">
@@ -179,6 +195,8 @@ export default function EditorPage() {
           </div>
         </main>
       </div>
+
+      <CommandPalette commands={commands} open={cmdOpen} onClose={() => setCmdOpen(false)} />
     </div>
   );
 }
