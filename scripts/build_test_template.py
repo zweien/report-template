@@ -10,8 +10,10 @@
 from pathlib import Path
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from docx.shared import Cm, Pt
 
 
 def set_cell_shading(cell, color: str):
@@ -25,13 +27,29 @@ def set_cell_shading(cell, color: str):
     tcPr.append(shd)
 
 
-def add_paragraph_style(doc, name: str, *, font_name=None, font_size=None,
-                        bold=None, italic=None, base_style=None):
-    """添加段落样式，已存在则跳过。"""
+def add_paragraph_style(
+    doc,
+    name: str,
+    *,
+    font_name=None,
+    font_size=None,
+    bold=None,
+    italic=None,
+    base_style=None,
+    alignment=None,
+    first_line_indent=None,
+    space_before=None,
+    space_after=None,
+    line_spacing_rule=None,
+    line_spacing=None,
+    east_asia_font=None,
+):
+    """添加或修改段落样式。内置样式已存在时直接修改属性。"""
     try:
         style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
     except ValueError:
-        return
+        style = doc.styles[name]
+
     if base_style:
         style.base_style = doc.styles[base_style]
     if font_name:
@@ -42,6 +60,24 @@ def add_paragraph_style(doc, name: str, *, font_name=None, font_size=None,
         style.font.bold = bold
     if italic is not None:
         style.font.italic = italic
+    if east_asia_font:
+        rPr = style.element.get_or_add_rPr()
+        rFonts = rPr.get_or_add_rFonts()
+        rFonts.set(qn("w:eastAsia"), east_asia_font)
+
+    pf = style.paragraph_format
+    if alignment is not None:
+        pf.alignment = alignment
+    if first_line_indent is not None:
+        pf.first_line_indent = first_line_indent
+    if space_before is not None:
+        pf.space_before = space_before
+    if space_after is not None:
+        pf.space_after = space_after
+    if line_spacing_rule is not None:
+        pf.line_spacing_rule = line_spacing_rule
+    if line_spacing is not None:
+        pf.line_spacing = line_spacing
 
 
 def add_table_style(doc, name: str):
@@ -56,12 +92,55 @@ def build_template(output_path: str):
     doc = Document()
 
     # ── 段落样式 ──────────────────────────────────────────────
-    add_paragraph_style(doc, "Heading 1", bold=True)
-    add_paragraph_style(doc, "Heading 2", bold=True)
-    add_paragraph_style(doc, "Heading 3", bold=True)
+    # 正文：五号宋体，两端对齐，首行缩进0.76cm，段前段后0磅，行距最小值18磅
+    add_paragraph_style(
+        doc, "Body Text",
+        font_size=Pt(10.5),
+        east_asia_font="宋体",
+        alignment=WD_ALIGN_PARAGRAPH.JUSTIFY,
+        first_line_indent=Cm(0.76),
+        space_before=Pt(0),
+        space_after=Pt(0),
+        line_spacing_rule=WD_LINE_SPACING.AT_LEAST,
+        line_spacing=Pt(18),
+    )
+
+    # 一级标题：四号黑体，段前18磅，段后0磅，行距最小值18磅，左起顶格
+    add_paragraph_style(
+        doc, "Heading 1",
+        font_size=Pt(14),
+        bold=True,
+        east_asia_font="黑体",
+        alignment=WD_ALIGN_PARAGRAPH.LEFT,
+        space_before=Pt(18),
+        space_after=Pt(0),
+        line_spacing_rule=WD_LINE_SPACING.AT_LEAST,
+        line_spacing=Pt(18),
+    )
+
+    # 二级标题：黑体五号，段前18磅，段后0磅，行距最小值16磅
+    add_paragraph_style(
+        doc, "Heading 2",
+        font_size=Pt(10.5),
+        bold=True,
+        east_asia_font="黑体",
+        space_before=Pt(18),
+        space_after=Pt(0),
+        line_spacing_rule=WD_LINE_SPACING.AT_LEAST,
+        line_spacing=Pt(16),
+    )
+
+    # 三级标题：五号宋体，行距最小值18磅
+    add_paragraph_style(
+        doc, "Heading 3",
+        font_size=Pt(10.5),
+        east_asia_font="宋体",
+        line_spacing_rule=WD_LINE_SPACING.AT_LEAST,
+        line_spacing=Pt(18),
+    )
+
     add_paragraph_style(doc, "Heading 4", bold=True)
     add_paragraph_style(doc, "Heading 5", bold=True)
-    add_paragraph_style(doc, "Body Text")
     add_paragraph_style(doc, "Caption", italic=True)
     add_paragraph_style(doc, "Legend", italic=True)
     add_paragraph_style(doc, "Figure Paragraph")
