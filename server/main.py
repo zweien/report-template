@@ -7,6 +7,7 @@ from server.config import ensure_dirs
 from server.database import init_db
 from server.routers.auth import router as auth_router
 from server.routers.templates import router as templates_router
+from server.routers.drafts import router as drafts_router
 
 
 @asynccontextmanager
@@ -28,6 +29,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(templates_router)
+app.include_router(drafts_router)
 
 
 @app.get("/api/health")
