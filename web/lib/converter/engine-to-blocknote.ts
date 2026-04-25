@@ -117,9 +117,12 @@ export function engineToBlocknoteBlocks(
 
       case "image": {
         const path = block.path || "";
+        // Only include images with valid URLs (http/https/blob/data)
+        const url = /^https?:\/\//.test(path) ? path : "";
+        if (!url) break;
         result.push(bn("image", {
           props: {
-            url: path.startsWith("/") ? path : "",
+            url,
             width: block.width,
             caption: block.caption || "",
           },

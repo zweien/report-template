@@ -51,8 +51,17 @@ export default function SectionEditor({ blocks, onChange, scrollToBlockId, onScr
 
   const initialContent = useMemo(() => {
     if (blocks.length === 0) return undefined;
-    const raw = isBlockNoteBlocks(blocks) ? blocks : engineToBlocknoteBlocks(blocks);
-    return migrateMermaidBlocks(raw);
+    try {
+      const raw = isBlockNoteBlocks(blocks) ? blocks : engineToBlocknoteBlocks(blocks);
+      const migrated = migrateMermaidBlocks(raw);
+      // Filter out blocks that BlockNote can't handle (e.g. image with empty URL)
+      return migrated.filter((b: any) => {
+        if (b.type === "image" && !b.props?.url) return false;
+        return true;
+      });
+    } catch {
+      return undefined;
+    }
   }, []);
 
   const editor = useCreateBlockNote({
