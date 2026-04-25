@@ -67,7 +67,7 @@ def _extract_section_headings(xml: str, sections: List[dict]) -> None:
         is_heading = style.lower().startswith("heading") if style else False
 
         # Check if this paragraph contains a subdoc placeholder
-        subdoc_match = re.search(r"\{\{p\s+([A-Z_][A-Z0-9_]*)\s*\}\}", text)
+        subdoc_match = re.search(r"\{\{p\s+" + _VAR_RE + r"\s*\}\}", text)
 
         if subdoc_match:
             placeholder = subdoc_match.group(1)
@@ -86,26 +86,37 @@ def _extract_section_headings(xml: str, sections: List[dict]) -> None:
             pending_headings.append({"text": text, "level": level})
 
 
+# Matches variable names: ASCII uppercase/digits/underscores OR CJK characters
+_VAR_RE = r"([A-Z_][A-Z0-9_]*|[\u4e00-\u9fff][\u4e00-\u9fffA-Za-z0-9_]*)"
+
+
 def _extract_scalar_vars(xml: str) -> List[str]:
-    pattern = r"\{\{\s*([A-Z_][A-Z0-9_]*)\b"
+    pattern = r"\{\{\s*" + _VAR_RE + r"\b"
     seen = set()
     return [v for v in re.findall(pattern, xml) if not (v in seen or seen.add(v))]
 
 
 def _extract_subdoc_placeholders(xml: str) -> List[str]:
-    pattern = r"\{\{p\s+([A-Z_][A-Z0-9_]*)\s*\}\}"
+    pattern = r"\{\{p\s+" + _VAR_RE + r"\s*\}\}"
     seen = set()
     return [v for v in re.findall(pattern, xml) if not (v in seen or seen.add(v))]
 
 
 def _extract_flags(xml: str) -> List[str]:
-    pattern = r"\{%p\s+if\s+([A-Z_][A-Z0-9_]*)\s*%\}"
+    pattern = r"\{%p\s+if\s+" + _VAR_RE + r"\s*%\}"
     seen = set()
     return [v for v in re.findall(pattern, xml) if not (v in seen or seen.add(v))]
 
 
+def _is_cjk(text: str) -> bool:
+    return any("\u4e00" <= ch <= "\u9fff" for ch in text)
+
+
 def _pair_flags_with_subdocs(flags, subdocs):
     sections = []
+    used_subdocs = set()
+
+    # Pass 1: conventional ENABLE_*/*_SUBDOC pairing
     for flag in flags:
         base = flag.replace("ENABLE_", "")
         placeholder = f"{base}_SUBDOC"
@@ -118,6 +129,28 @@ def _pair_flags_with_subdocs(flags, subdocs):
                 "title": title,
                 "required_styles": [],
             })
+            used_subdocs.add(placeholder)
+
+    # Pass 2: CJK or unconventional names — pair flag with next unpaired subdoc by XML order
+    if len(sections) < len(flags):
+        unpaired_subdocs = [s for s in subdocs if s not in used_subdocs and s != "APPENDICES_SUBDOC"]
+        for flag in flags:
+            if any(s["flag_name"] == flag for s in sections):
+                continue
+            if unpaired_subdocs:
+                placeholder = unpaired_subdocs.pop(0)
+                used_subdocs.add(placeholder)
+                has_cjk = _is_cjk(flag) or _is_cjk(placeholder)
+                section_id = flag if has_cjk else flag.replace("ENABLE_", "").lower()
+                title = flag if has_cjk else flag.replace("ENABLE_", "").replace("_", " ").title()
+                sections.append({
+                    "id": section_id,
+                    "placeholder": placeholder,
+                    "flag_name": flag,
+                    "title": title,
+                    "required_styles": [],
+                })
+
     return sections
 
 
