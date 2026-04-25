@@ -129,6 +129,16 @@ def render_report(
     _build_bundle_attachments_context(tpl, payload_model, context, style_map, enabled_attachments)
 
     tpl.render(context, autoescape=True)
+
+    # 确保 OMML (m:) 命名空间在 document.xml 根元素上已声明，
+    # 否则 formula block 插入的 <m:oMath> 会导致 XML 解析错误。
+    root = tpl.docx._element
+    if "m" not in root.nsmap:
+        root.set(
+            "{http://www.w3.org/2000/xmlns/}m",
+            "http://schemas.openxmlformats.org/officeDocument/2006/math",
+        )
+
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     tpl.save(output_path)
     logger.info("Report saved: %s", output_path)

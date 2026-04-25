@@ -24,8 +24,7 @@
       "placeholder": "RESEARCH_CONTENT_SUBDOC",
       "flag_name": "ENABLE_RESEARCH_CONTENT",
       "enabled": true,
-      "subdoc_title": "一、研究内容与技术路线",
-      "subdoc_title_level": 2,
+    
       "blocks": [
         {
           "type": "heading",
@@ -122,8 +121,7 @@
       "placeholder": "RESEARCH_BASIS_SUBDOC",
       "flag_name": "ENABLE_RESEARCH_BASIS",
       "enabled": true,
-      "subdoc_title": "二、研究基础与条件保障",
-      "subdoc_title_level": 2,
+     
       "blocks": [
         {
           "type": "heading",
@@ -181,8 +179,7 @@
       "placeholder": "IMPLEMENTATION_PLAN_SUBDOC",
       "flag_name": "ENABLE_IMPLEMENTATION_PLAN",
       "enabled": true,
-      "subdoc_title": "三、实施计划与进度安排",
-      "subdoc_title_level": 2,
+     
       "blocks": [
         {
           "type": "heading",

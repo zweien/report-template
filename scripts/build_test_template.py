@@ -85,33 +85,42 @@ def build_template(output_path: str):
 
     # ── 目录区 ────────────────────────────────────────────────
     doc.add_paragraph("{%p if ENABLE_TOC %}")
+    doc.add_paragraph("目 录", style="Heading 1")
     doc.add_paragraph("{{p TOC_SUBDOC }}")
     doc.add_paragraph("{%p endif %}")
     doc.add_page_break()
 
     # ── 第一章：研究内容 ──────────────────────────────────────
     doc.add_paragraph("{%p if ENABLE_RESEARCH_CONTENT %}")
-    doc.add_paragraph("一、研究内容与技术路线")
+    doc.add_paragraph("一、研究内容与技术路线", style="Heading 1")
     doc.add_paragraph("{{p RESEARCH_CONTENT_SUBDOC }}")
     doc.add_paragraph("{%p endif %}")
 
     # ── 第二章：研究基础 ──────────────────────────────────────
     doc.add_paragraph("{%p if ENABLE_RESEARCH_BASIS %}")
-    doc.add_paragraph("二、研究基础与条件保障")
+    doc.add_paragraph("二、研究基础与条件保障", style="Heading 1")
     doc.add_paragraph("{{p RESEARCH_BASIS_SUBDOC }}")
     doc.add_paragraph("{%p endif %}")
 
     # ── 第三章：实施计划 ──────────────────────────────────────
     doc.add_paragraph("{%p if ENABLE_IMPLEMENTATION_PLAN %}")
-    doc.add_paragraph("三、实施计划与进度安排")
+    doc.add_paragraph("三、实施计划与进度安排", style="Heading 1")
     doc.add_paragraph("{{p IMPLEMENTATION_PLAN_SUBDOC }}")
     doc.add_paragraph("{%p endif %}")
 
     # ── 附件区 ────────────────────────────────────────────────
     doc.add_paragraph("{%p if ENABLE_APPENDICES %}")
-    doc.add_paragraph("附件")
+    doc.add_paragraph("附件", style="Heading 1")
     doc.add_paragraph("{{p APPENDICES_SUBDOC }}")
     doc.add_paragraph("{%p endif %}")
+
+    # ── 确保 OMML 命名空间已声明 ────────────────────────────────
+    root = doc._element
+    if "m" not in root.nsmap:
+        root.set(
+            "{http://www.w3.org/2000/xmlns/}m",
+            "http://schemas.openxmlformats.org/officeDocument/2006/math",
+        )
 
     # ── 保存 ──────────────────────────────────────────────────
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
