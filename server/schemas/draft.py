@@ -13,6 +13,7 @@ class DraftUpdate(BaseModel):
     context: Optional[Dict[str, Any]] = None
     sections: Optional[Dict[str, Any]] = None
     attachments: Optional[Dict[str, Any]] = None
+    section_enabled: Optional[Dict[str, bool]] = None
 
 
 class DraftResponse(BaseModel):
@@ -22,6 +23,7 @@ class DraftResponse(BaseModel):
     context: Dict[str, Any]
     sections: Dict[str, Any]
     attachments: Dict[str, Any]
+    section_enabled: Dict[str, bool]
     status: str
     created_at: str
     updated_at: str

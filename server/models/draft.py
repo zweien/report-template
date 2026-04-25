@@ -17,6 +17,7 @@ class Draft(Base):
     context = Column(JSON, nullable=False, default=dict)
     sections = Column(JSON, nullable=False, default=dict)
     attachments = Column(JSON, nullable=False, default=dict)
+    section_enabled = Column(JSON, nullable=False, default=dict)
     status = Column(String(20), nullable=False, default="draft")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -23,6 +23,7 @@ export default function EditorPage() {
     exportDocx,
     updateTitle,
     updateContext,
+    toggleSection,
   } = useDraftStore();
   const [loading, setLoading] = useState(true);
   const [cmdOpen, setCmdOpen] = useState(false);
@@ -141,21 +142,41 @@ export default function EditorPage() {
         <aside className="w-56 border-r border-white/[0.06] bg-[#141415] p-3 overflow-y-auto">
           <p className="mb-2 text-xs font-medium text-[#8B8B93]">Sections</p>
           <div className="space-y-1">
-            {sectionIds.map((id) => (
-              <button
-                key={id}
-                onClick={() => setActiveSection(id)}
-                className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${
-                  activeSection === id
-                    ? "bg-[#5B6CF0]/12 text-[#E8E8ED]"
-                    : "text-[#8B8B93] hover:bg-white/[0.04] hover:text-[#E8E8ED]"
-                }`}
-              >
-                {id
-                  .replace(/_/g, " ")
-                  .replace(/\b\w/g, (c) => c.toUpperCase())}
-              </button>
-            ))}
+            {sectionIds.map((id) => {
+              const enabled = draft.section_enabled?.[id] !== false;
+              return (
+                <div
+                  key={id}
+                  className={`group flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors ${
+                    activeSection === id
+                      ? "bg-[#5B6CF0]/12 text-[#E8E8ED]"
+                      : "text-[#8B8B93] hover:bg-white/[0.04] hover:text-[#E8E8ED]"
+                  }`}
+                >
+                  <button
+                    onClick={() => setActiveSection(id)}
+                    className="flex-1 text-left text-sm"
+                  >
+                    {id
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleSection(id); scheduleAutoSave(); }}
+                    className={`flex-shrink-0 h-4 w-7 rounded-full transition-colors ${
+                      enabled ? "bg-[#5B6CF0]" : "bg-white/10"
+                    }`}
+                    title={enabled ? "Disable section" : "Enable section"}
+                  >
+                    <span
+                      className={`block h-3 w-3 rounded-full bg-white transition-transform ${
+                        enabled ? "translate-x-3.5" : "translate-x-0.5"
+                      }`}
+                    />
+                  </button>
+                </div>
+              );
+            })}
           </div>
 
           {/* Context vars */}
@@ -184,14 +205,26 @@ export default function EditorPage() {
                 .replace(/_/g, " ")
                 .replace(/\b\w/g, (c) => c.toUpperCase())}
             </h2>
-            <SectionEditor
-              key={activeSection}
-              blocks={draft.sections[activeSection] || []}
-              onChange={(blocks) => {
-                useDraftStore.getState().updateSection(activeSection, blocks);
-                scheduleAutoSave();
-              }}
-            />
+            {draft.section_enabled?.[activeSection] === false ? (
+              <div className="flex flex-col items-center justify-center py-16 text-[#8B8B93]">
+                <p className="text-sm">This section is disabled and will not appear in exports.</p>
+                <button
+                  onClick={() => { toggleSection(activeSection); scheduleAutoSave(); }}
+                  className="mt-3 rounded-md bg-[#5B6CF0] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#5B6CF0]/90"
+                >
+                  Enable section
+                </button>
+              </div>
+            ) : (
+              <SectionEditor
+                key={activeSection}
+                blocks={draft.sections[activeSection] || []}
+                onChange={(blocks) => {
+                  useDraftStore.getState().updateSection(activeSection, blocks);
+                  scheduleAutoSave();
+                }}
+              />
+            )}
           </div>
         </main>
       </div>

@@ -212,6 +212,7 @@ def draft_to_payload(draft_data: dict, template_parsed_structure: dict) -> dict:
     by the frontend), so we pass them through directly with minor format
     adjustments where the frontend format differs from report-engine.
     """
+    section_enabled = draft_data.get("section_enabled", {})
     sections = []
     for section_meta in template_parsed_structure.get("sections", []):
         section_id = section_meta["id"]
@@ -224,7 +225,7 @@ def draft_to_payload(draft_data: dict, template_parsed_structure: dict) -> dict:
             "id": section_id,
             "placeholder": section_meta["placeholder"],
             "flag_name": section_meta["flag_name"],
-            "enabled": True,
+            "enabled": section_enabled.get(section_id, True),
             "blocks": blocks_data,
         })
 

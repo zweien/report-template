@@ -57,6 +57,7 @@ def create_draft(
         context=generate_empty_context(tmpl.parsed_structure),
         sections=generate_empty_sections(tmpl.parsed_structure),
         attachments={},
+        section_enabled={s["id"]: True for s in tmpl.parsed_structure.get("sections", [])},
     )
     db.add(draft)
     db.commit()
@@ -68,6 +69,7 @@ def create_draft(
         context=draft.context,
         sections=draft.sections,
         attachments=draft.attachments,
+        section_enabled=draft.section_enabled,
         status=draft.status,
         created_at=draft.created_at.isoformat(),
         updated_at=draft.updated_at.isoformat(),
@@ -124,6 +126,7 @@ def get_draft(
         context=draft.context,
         sections=ordered_sections,
         attachments=draft.attachments,
+        section_enabled=draft.section_enabled,
         status=draft.status,
         created_at=draft.created_at.isoformat(),
         updated_at=draft.updated_at.isoformat(),
@@ -153,6 +156,8 @@ def update_draft(
         draft.sections = req.sections
     if req.attachments is not None:
         draft.attachments = req.attachments
+    if req.section_enabled is not None:
+        draft.section_enabled = req.section_enabled
     draft.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(draft)
@@ -163,6 +168,7 @@ def update_draft(
         context=draft.context,
         sections=draft.sections,
         attachments=draft.attachments,
+        section_enabled=draft.section_enabled,
         status=draft.status,
         created_at=draft.created_at.isoformat(),
         updated_at=draft.updated_at.isoformat(),
@@ -208,6 +214,7 @@ def export_draft(
         "context": draft.context,
         "sections": draft.sections,
         "attachments": draft.attachments,
+        "section_enabled": draft.section_enabled,
     }
     try:
         output_path = export_draft_to_docx(draft_data, tmpl.file_path, tmpl.parsed_structure)

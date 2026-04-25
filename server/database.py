@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from server.config import DATABASE_URL
@@ -21,3 +21,12 @@ def get_db():
 
 def init_db():
     Base.metadata.create_all(bind=engine)
+    # Add new columns to existing tables
+    with engine.connect() as conn:
+        insp = inspect(engine)
+        cols = {c["name"] for c in insp.get_columns("drafts")}
+        if "section_enabled" not in cols:
+            conn.execute(text(
+                "ALTER TABLE drafts ADD COLUMN section_enabled JSON DEFAULT '{}'"
+            ))
+            conn.commit()

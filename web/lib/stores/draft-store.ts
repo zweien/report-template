@@ -8,6 +8,7 @@ interface DraftData {
   context: Record<string, string>;
   sections: Record<string, any[]>;
   attachments: Record<string, any[]>;
+  section_enabled: Record<string, boolean>;
   status: string;
 }
 
@@ -22,6 +23,7 @@ interface DraftStore {
   updateSection: (id: string, blocks: any[]) => void;
   updateContext: (key: string, value: string) => void;
   updateTitle: (title: string) => void;
+  toggleSection: (id: string) => void;
   save: () => Promise<void>;
   exportDocx: () => Promise<void>;
 }
@@ -71,6 +73,13 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
     set({ draft: { ...draft, title }, isDirty: true, saveStatus: "idle" });
   },
 
+  toggleSection: (id) => {
+    const { draft } = get();
+    if (!draft) return;
+    const section_enabled = { ...draft.section_enabled, [id]: !draft.section_enabled[id] };
+    set({ draft: { ...draft, section_enabled }, isDirty: true, saveStatus: "idle" });
+  },
+
   save: async () => {
     const { draft } = get();
     if (!draft) return;
@@ -81,6 +90,7 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
         context: draft.context,
         sections: draft.sections,
         attachments: draft.attachments,
+        section_enabled: draft.section_enabled,
       });
       set({ isDirty: false, saveStatus: "saved" });
     } catch {
