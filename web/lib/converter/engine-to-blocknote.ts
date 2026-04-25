@@ -15,12 +15,20 @@ export interface BlockNoteBlock {
   type: string;
   props?: Record<string, any>;
   content?: any;
+  children?: BlockNoteBlock[];
 }
 
 let blockIdCounter = 0;
 
 function nextId(): string {
   return `bn-${++blockIdCounter}`;
+}
+
+function bn(
+  type: string,
+  overrides: Partial<BlockNoteBlock> = {}
+): BlockNoteBlock {
+  return { id: nextId(), type, children: [], ...overrides };
 }
 
 /**
@@ -34,26 +42,20 @@ export function engineToBlocknoteBlocks(
   for (const block of blocks) {
     switch (block.type) {
       case "heading":
-        result.push({
-          id: nextId(),
-          type: "heading",
+        result.push(bn("heading", {
           props: { level: block.level || 2 },
           content: [{ type: "text", text: block.text || "" }],
-        });
+        }));
         break;
 
       case "paragraph":
-        result.push({
-          id: nextId(),
-          type: "paragraph",
+        result.push(bn("paragraph", {
           content: [{ type: "text", text: block.text || "" }],
-        });
+        }));
         break;
 
       case "rich_paragraph":
-        result.push({
-          id: nextId(),
-          type: "paragraph",
+        result.push(bn("paragraph", {
           content: (block.segments || []).map((seg: any) => ({
             type: "text",
             text: seg.text || "",
@@ -62,60 +64,80 @@ export function engineToBlocknoteBlocks(
               ...(seg.italic ? { italic: true } : {}),
             },
           })),
-        });
+        }));
         break;
 
       case "bullet_list":
         for (const item of block.items || []) {
-          result.push({
-            id: nextId(),
-            type: "bulletListItem",
+          result.push(bn("bulletListItem", {
             content: [{ type: "text", text: item }],
-          });
+          }));
         }
         break;
 
       case "numbered_list":
         for (const item of block.items || []) {
-          result.push({
-            id: nextId(),
-            type: "numberedListItem",
+          result.push(bn("numberedListItem", {
             content: [{ type: "text", text: item }],
-          });
+          }));
         }
         break;
 
       case "table":
-        // BlockNote tables have a different structure; store as-is for now
-        // and let the editor re-create from the engine format
-        result.push({
-          id: nextId(),
-          type: "table",
+        result.push(bn("table", {
           content: buildTableContent(block.headers || [], block.rows || []),
-        });
+          props: { textColor: {} },
+        }));
         break;
 
       case "quote":
-        result.push({
-          id: nextId(),
-          type: "quote",
+        result.push(bn("quote", {
           content: [{ type: "text", text: block.text || "" }],
-        });
+        }));
+        break;
+
+      case "note":
+        result.push(bn("quote", {
+          content: [{ type: "text", text: block.text || "" }],
+        }));
         break;
 
       case "code_block":
-        result.push({
-          id: nextId(),
-          type: "codeBlock",
+        result.push(bn("codeBlock", {
           content: [{ type: "text", text: block.code || "" }],
-        });
+        }));
         break;
 
-      case "page_break":
-        result.push({
-          id: nextId(),
-          type: "pageBreak",
-        });
+      case "formula":
+        result.push(bn("codeBlock", {
+          props: { language: "latex" },
+          content: [{ type: "text", text: `$${block.formula || ""}$` }],
+        }));
+        break;
+
+      case "image":
+        result.push(bn("image", {
+          props: {
+            url: block.path || "",
+            width: block.width,
+            caption: block.caption || "",
+          },
+        }));
+        break;
+
+      // page_break not supported by BlockNote, skip
+
+      case "horizontal_rule":
+        result.push(bn("divider"));
+        break;
+
+      case "checklist":
+        for (let i = 0; i < (block.items || []).length; i++) {
+          result.push(bn("checkListItem", {
+            props: { checked: !!block.checked?.[i] },
+            content: [{ type: "text", text: block.items[i] }],
+          }));
+        }
         break;
 
       // Blocks not supported by BlockNote are silently skipped
@@ -129,14 +151,26 @@ export function engineToBlocknoteBlocks(
 
 /**
  * Build BlockNote table content from headers + rows.
+ * BlockNote table content must be { type: "tableContent", rows: [...] }.
  */
 function buildTableContent(
   headers: string[],
   rows: string[][]
-): any[][] {
-  const headerRow = headers.map((h) => ({ content: [{ type: "text", text: h }] }));
-  const dataRows = rows.map((row) =>
-    row.map((cell) => ({ content: [{ type: "text", text: cell }] }))
-  );
-  return [headerRow, ...dataRows];
+): any {
+  const allRows = [headers, ...rows];
+  return {
+    type: "tableContent",
+    columnWidths: headers.map(() => undefined),
+    rows: allRows.map((row) => ({
+      cells: row.map((cell) => ({
+        type: "tableCell",
+        props: {
+          backgroundColor: "transparent",
+          textColor: "default",
+          textAlignment: "left",
+        },
+        content: [{ type: "text", text: cell }],
+      })),
+    })),
+  };
 }

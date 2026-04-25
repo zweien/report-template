@@ -144,19 +144,40 @@ def convert_blocknote_blocks(blocks: List[dict]) -> List[dict]:
     return result
 
 
+def _normalize_blocks(blocks: List[dict]) -> List[dict]:
+    """Adjust block formats from frontend storage to report-engine expectations."""
+    result = []
+    for block in blocks:
+        b = dict(block)
+        if b.get("type") == "checklist" and "checked" in b:
+            items = []
+            for i, text in enumerate(b.get("items", [])):
+                items.append({"text": str(text), "checked": bool(b["checked"][i]) if i < len(b["checked"]) else False})
+            b["items"] = items
+            b.pop("checked", None)
+        result.append(b)
+    return result
+
+
 def draft_to_payload(draft_data: dict, template_parsed_structure: dict) -> dict:
-    """Convert a draft to a report-engine payload."""
+    """Convert a draft to a report-engine payload.
+
+    The draft stores engine-format blocks (already converted from BlockNote
+    by the frontend), so we pass them through directly with minor format
+    adjustments where the frontend format differs from report-engine.
+    """
     sections = []
     for section_meta in template_parsed_structure.get("sections", []):
         section_id = section_meta["id"]
         blocks_data = draft_data.get("sections", {}).get(section_id, [])
+        blocks_data = _normalize_blocks(blocks_data)
 
         sections.append({
             "id": section_id,
             "placeholder": section_meta["placeholder"],
             "flag_name": section_meta["flag_name"],
             "enabled": True,
-            "blocks": convert_blocknote_blocks(blocks_data),
+            "blocks": blocks_data,
         })
 
     payload = {
