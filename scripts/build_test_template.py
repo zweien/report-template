@@ -64,6 +64,11 @@ def add_paragraph_style(
         rPr = style.element.get_or_add_rPr()
         rFonts = rPr.get_or_add_rFonts()
         rFonts.set(qn("w:eastAsia"), east_asia_font)
+        # 清除 theme 属性，避免 Word 优先使用主题字体而忽略直接指定的字体名
+        for attr in ("asciiTheme", "hAnsiTheme", "eastAsiaTheme", "cstheme"):
+            key = qn(f"w:{attr}")
+            if key in rFonts.attrib:
+                del rFonts.attrib[key]
 
     pf = style.paragraph_format
     if alignment is not None:
