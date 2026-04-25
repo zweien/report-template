@@ -36,6 +36,13 @@ bash scripts/editor.sh backend
 bash scripts/editor.sh frontend
 ```
 
+### 测试账号
+
+```
+用户名: admin
+密码: admin123
+```
+
 ### 测试与检查
 
 ```bash
