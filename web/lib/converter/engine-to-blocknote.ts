@@ -127,6 +127,13 @@ export function engineToBlocknoteBlocks(
         break;
       }
 
+      case "mermaid":
+        result.push(bn("codeBlock", {
+          props: { language: "mermaid" },
+          content: [{ type: "text", text: block.code || "" }],
+        }));
+        break;
+
       // page_break not supported by BlockNote, skip
 
       case "horizontal_rule":

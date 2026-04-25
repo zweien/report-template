@@ -102,6 +102,9 @@ function convertBlock(block: BlockNoteBlock): EngineBlock | null {
     case "codeBlock": {
       const text = extractText(block.content);
       const lang = block.props?.language || "";
+      if (lang === "mermaid") {
+        return { type: "mermaid", code: text };
+      }
       if (lang === "latex" || (text.startsWith("$") && text.endsWith("$"))) {
         return { type: "formula", formula: text.replace(/^\$|\$$/g, "") };
       }

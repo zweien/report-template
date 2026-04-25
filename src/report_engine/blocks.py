@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+import base64
+import logging
+import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any, Callable, Dict
+from urllib.request import urlopen
 
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK, WD_LINE_SPACING
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt
 from lxml import etree
+
+logger = logging.getLogger("report_engine")
 
 
 DEFAULT_STYLE_MAP = {
@@ -978,6 +985,58 @@ def add_columns_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]
     doc.add_paragraph("", style=body_style)
 
 
+def _render_mermaid_to_png(mermaid_code: str, output_path: Path) -> bool:
+    """Render Mermaid code to PNG. Returns True on success."""
+    # Strategy 1: mmdc CLI
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".mmd", delete=False) as f:
+            f.write(mermaid_code)
+            tmp_mmd = f.name
+        result = subprocess.run(
+            ["mmdc", "-i", tmp_mmd, "-o", str(output_path), "-b", "white", "-w", "1200"],
+            timeout=30,
+            capture_output=True,
+        )
+        Path(tmp_mmd).unlink(missing_ok=True)
+        if result.returncode == 0 and output_path.exists():
+            return True
+    except FileNotFoundError:
+        pass
+    except Exception as e:
+        logger.warning("mmdc rendering failed: %s", e)
+
+    # Strategy 2: mermaid.ink API
+    try:
+        encoded = base64.urlsafe_b64encode(mermaid_code.encode("utf-8")).decode("ascii")
+        url = f"https://mermaid.ink/img/{encoded}?bgColor=white"
+        resp = urlopen(url, timeout=30)
+        if resp.status == 200:
+            data = resp.read()
+            output_path.write_bytes(data)
+            return True
+    except Exception as e:
+        logger.warning("mermaid.ink rendering failed: %s", e)
+
+    return False
+
+
+def add_mermaid_block(doc: Any, block: Dict[str, Any], style_map: Dict[str, str]) -> None:
+    code = str(block["code"])
+
+    # Try rendering to PNG, then insert as image
+    try:
+        tmp = Path(tempfile.mktemp(suffix=".png"))
+        if _render_mermaid_to_png(code, tmp):
+            add_image_block(doc, {"type": "image", "path": str(tmp)}, style_map)
+            return
+        tmp.unlink(missing_ok=True)
+    except Exception as e:
+        logger.warning("Mermaid rendering failed, falling back to code block: %s", e)
+
+    # Fallback: render as code block
+    add_code_block_block(doc, {"type": "code_block", "code": f"[Mermaid 渲染失败]\n{code}"}, style_map)
+
+
 def create_default_registry() -> BlockRegistry:
     registry = BlockRegistry()
     registry.register("heading", add_heading_block)
@@ -1000,4 +1059,5 @@ def create_default_registry() -> BlockRegistry:
     registry.register("formula", add_formula_block)
     registry.register("columns", add_columns_block)
     registry.register("ascii_diagram", add_ascii_diagram_block)
+    registry.register("mermaid", add_mermaid_block)
     return registry

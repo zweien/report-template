@@ -32,6 +32,7 @@ BLOCK_REQUIRED_FIELDS = {
     "formula": ["latex"],
     "columns": ["count", "columns"],
     "ascii_diagram": ["ascii"],
+    "mermaid": ["code"],
 }
 
 logger = logging.getLogger("report_engine")

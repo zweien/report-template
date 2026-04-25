@@ -79,6 +79,9 @@ def _convert_quote(block: dict) -> dict:
 
 def _convert_code_block(block: dict) -> dict:
     code = _extract_text(block.get("content", []))
+    language = block.get("props", {}).get("language", "")
+    if language == "mermaid":
+        return {"type": "mermaid", "code": code}
     return {"type": "code_block", "code": code}
 
 

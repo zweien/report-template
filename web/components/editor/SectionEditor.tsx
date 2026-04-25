@@ -5,46 +5,45 @@ import { BlockNoteView } from "@blocknote/shadcn";
 import "@blocknote/shadcn/style.css";
 import { useCallback, useRef } from "react";
 import {
-  blocknoteToEngineBlocks,
-  type BlockNoteBlock,
-} from "@/lib/converter/blocknote-to-engine";
-import {
   engineToBlocknoteBlocks,
   type EngineBlock,
 } from "@/lib/converter/engine-to-blocknote";
+import { schema } from "@/lib/schema";
+import MermaidCodeBlock from "./MermaidCodeBlock";
 
 interface SectionEditorProps {
-  /** Engine blocks to display (converted to BlockNote format on mount). */
+  /** Blocks to display. Can be engine-format or already BlockNote-format. */
   blocks: EngineBlock[];
-  /** Called when the user edits; receives engine-format blocks. */
-  onChange: (blocks: EngineBlock[]) => void;
+  /** Called when the user edits; receives the updated blocks. */
+  onChange: (blocks: any[]) => void;
 }
 
-/**
- * Rich-text editor for a single draft section.
- *
- * Converts between engine blocks (storage) and BlockNote blocks (editor)
- * and debounces onChange callbacks to avoid excessive re-renders.
- */
+function isBlockNoteBlocks(blocks: EngineBlock[]): boolean {
+  return blocks.length > 0 && blocks.every(
+    (b) => typeof b === "object" && b != null && "id" in b && "type" in b && "children" in b
+  );
+}
+
 export default function SectionEditor({ blocks, onChange }: SectionEditorProps) {
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Convert engine blocks to BlockNote format for initial content
-  const initialContent =
-    blocks.length > 0 ? engineToBlocknoteBlocks(blocks) : undefined;
+  // If blocks are already in BlockNote format (stored from editor), use directly.
+  // Otherwise convert from engine format.
+  const initialContent = blocks.length > 0
+    ? isBlockNoteBlocks(blocks)
+      ? blocks
+      : engineToBlocknoteBlocks(blocks)
+    : undefined;
 
-  const editor = useCreateBlockNote({ initialContent });
+  const editor = useCreateBlockNote({ schema, initialContent });
 
   const handleEditorChange = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      const engineBlocks = blocknoteToEngineBlocks(
-        editor.document as BlockNoteBlock[]
-      );
-      onChangeRef.current(engineBlocks);
+      onChangeRef.current(editor.document);
     }, 100);
   }, [editor]);
 
@@ -55,6 +54,7 @@ export default function SectionEditor({ blocks, onChange }: SectionEditorProps) 
         onChange={handleEditorChange}
         theme="dark"
       />
+      <MermaidCodeBlock editor={editor} />
     </div>
   );
 }
