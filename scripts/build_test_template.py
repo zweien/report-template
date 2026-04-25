@@ -97,6 +97,13 @@ def build_template(output_path: str):
     doc = Document()
 
     # ── 段落样式 ──────────────────────────────────────────────
+    # 默认段落样式：五号宋体
+    add_paragraph_style(
+        doc, "Normal",
+        font_size=Pt(10.5),
+        east_asia_font="宋体",
+    )
+
     # 正文：五号宋体，两端对齐，首行缩进0.76cm，段前段后0磅，行距最小值18磅
     add_paragraph_style(
         doc, "Body Text",
