@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from server.database import get_db
@@ -9,6 +10,7 @@ from server.models.template import Template
 from server.schemas.draft import DraftCreate, DraftListItem, DraftResponse, DraftUpdate
 from server.services.auth_service import get_current_user
 from server.services.draft_service import generate_empty_context, generate_empty_sections
+from server.services.export_service import export_draft_to_docx
 
 router = APIRouter(prefix="/api/drafts", tags=["drafts"])
 
@@ -164,3 +166,37 @@ def delete_draft(
         raise HTTPException(404, "Draft not found")
     db.delete(draft)
     db.commit()
+
+
+@router.post("/{draft_id}/export")
+def export_draft(
+    draft_id: str,
+    authorization: str = Header(...),
+    db: Session = Depends(get_db),
+):
+    user = _auth(authorization, db)
+    draft = (
+        db.query(Draft)
+        .filter(Draft.id == draft_id, Draft.user_id == user.id)
+        .first()
+    )
+    if not draft:
+        raise HTTPException(404, "Draft not found")
+    tmpl = db.query(Template).filter(Template.id == draft.template_id).first()
+    if not tmpl:
+        raise HTTPException(404, "Template not found")
+    draft_data = {
+        "context": draft.context,
+        "sections": draft.sections,
+        "attachments": draft.attachments,
+    }
+    try:
+        output_path = export_draft_to_docx(draft_data, tmpl.file_path, tmpl.parsed_structure)
+    except Exception as e:
+        raise HTTPException(500, f"Export failed: {e}")
+    filename = f"{draft.title}.docx"
+    return FileResponse(
+        output_path,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename=filename,
+    )
