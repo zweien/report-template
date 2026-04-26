@@ -32,6 +32,7 @@ export default function EditorPage() {
   const [loading, setLoading] = useState(true);
   const [cmdOpen, setCmdOpen] = useState(false);
   const [outlineOpen, setOutlineOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [scrollTargetBlockId, setScrollTargetBlockId] = useState<string | null>(null);
 
   // Auto-save: debounce 3 seconds after last edit
@@ -149,6 +150,20 @@ export default function EditorPage() {
           >
             ← Back
           </button>
+          <button
+            onClick={() => setSidebarOpen((v) => !v)}
+            className={`rounded-md border px-2.5 py-1.5 text-xs transition-colors ${
+              sidebarOpen
+                ? "border-[var(--brand)]/40 text-[var(--brand)]"
+                : "border-[var(--border-standard)] text-[var(--text-secondary)] hover:bg-[var(--surface-transparent-hover)]"
+            }`}
+            title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+          >
+            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <line x1="9" y1="3" x2="9" y2="21" />
+            </svg>
+          </button>
           <input
             value={draft.title}
             onChange={(e) => updateTitle(e.target.value)}
@@ -208,6 +223,7 @@ export default function EditorPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
+        {sidebarOpen && (
         <aside className="w-56 border-r border-[var(--border-subtle)] bg-[var(--bg-panel)] p-3 overflow-y-auto">
           <p className="mb-2 text-xs font-medium text-[var(--text-secondary)]">Sections</p>
           <div className="space-y-1">
@@ -265,6 +281,7 @@ export default function EditorPage() {
             ))}
           </div>
         </aside>
+        )}
 
         {/* Editor area - placeholder for BlockNote */}
         <main className="flex-1 overflow-y-auto bg-[var(--bg-canvas)] p-6">
