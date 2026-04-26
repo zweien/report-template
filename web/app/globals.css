@@ -40,6 +40,22 @@
   --primary-foreground: #f7f8f8;
   --accent: #f1f5f9;
   --accent-foreground: var(--text-primary);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: #ef4444;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
 /* ─── Dark Theme ─── */
@@ -80,6 +96,22 @@
   --primary-foreground: #08090a;
   --accent: #1e1e22;
   --accent-foreground: var(--text-primary);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: #ef4444;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
 /* ─── shadcn utility classes for BlockNote portals ─── */
@@ -151,4 +183,13 @@ body {
 
 .bn-inline-content[data-is-empty="true"]::before {
   color: var(--placeholder) !important;
+}
+
+/* ─── BlockNote suggestion menu item hover/selected/focus ─── */
+.bn-suggestion-menu-item:hover,
+.bn-suggestion-menu-item:focus {
+  background-color: var(--bg-hover) !important;
+}
+.bn-suggestion-menu-item[aria-selected="true"] {
+  background-color: var(--bg-hover) !important;
 }
