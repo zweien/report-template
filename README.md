@@ -17,6 +17,9 @@
 - **Subdoc 渲染**：复杂正文通过子文档生成，不将富文本逻辑堆到主模板
 - **章节开关**：支持按条件启用/禁用章节和附件
 - **校验与检查**：渲染前自动校验 payload 结构、检查模板样式和占位符契约
+- **在线编辑器**：基于 BlockNote + Next.js 的分段编辑器，支持所见即所得编辑、模板管理、草稿保存、.docx 导出
+- **AI 辅助编辑**：集成 AI 改写、翻译、续写等功能，支持选区级别的精准编辑（兼容 OpenAI API）
+- **深浅主题**：Linear 风格深色/浅色主题切换
 - **兼容旧入口**：保留早期脚本的兼容 wrapper，平滑迁移
 
 ---
@@ -107,6 +110,67 @@ report-engine render --template template.docx --payload payload.json --output ou
 
 ---
 
+## 在线编辑器
+
+项目包含一个基于 BlockNote + Next.js 16 + FastAPI 的在线报告编辑器。
+
+### 快速启动
+
+```bash
+# 安装所有依赖（后端 + 前端）
+bash scripts/editor.sh install
+
+# 启动前后端开发服务器
+bash scripts/editor.sh dev
+# 后端: http://localhost:8070
+# 前端: http://localhost:3070
+```
+
+测试账号：`admin` / `admin123`
+
+### 功能
+
+- **分段编辑**：按章节（Section）分段加载和编辑，侧边栏管理章节开关
+- **AI 辅助**：选中文字后可通过格式工具栏或 Slash Menu 触发 AI 改写、翻译、续写等操作
+- **Slash Menu**：输入 `/` 插入标题、列表、表格、图片、Mermaid 图表等内容块
+- **导入/导出**：支持 JSON payload 导入，导出为 .docx 文件
+- **深浅主题**：Linear 风格设计，支持一键切换
+
+### AI 配置
+
+在 `web/.env.local` 中配置 OpenAI 兼容 API：
+
+```env
+OPENAI_BASE_URL=https://your-api-endpoint/v1
+OPENAI_API_KEY=your-api-key
+OPENAI_MODEL=gpt-4o
+```
+
+AI 功能基于 BlockNote `@blocknote/xl-ai` 扩展，后端通过 Next.js Route Handler 代理请求。
+
+### 常用命令
+
+```bash
+bash scripts/editor.sh status     # 检查服务状态
+bash scripts/editor.sh stop       # 停止所有服务
+bash scripts/editor.sh test       # 运行后端测试
+bash scripts/editor.sh lint       # 前端类型检查
+bash scripts/editor.sh build      # 构建前端生产版本
+bash scripts/editor.sh clean      # 清理临时文件
+bash scripts/editor.sh reset-db   # 重置数据库
+```
+
+### 技术栈
+
+| 层 | 技术 |
+|----|------|
+| 后端 | FastAPI + SQLite |
+| 前端 | Next.js 16 + BlockNote + Zustand |
+| 样式 | Tailwind CSS v4 |
+| AI | Vercel AI SDK + @blocknote/xl-ai |
+
+---
+
 ## 支持的 Block 类型
 
 | Block | 说明 |
@@ -150,15 +214,17 @@ report-template/
 │   ├── subdoc.py               # Subdoc 构建
 │   ├── compat.py               # 旧结构兼容
 │   └── cli.py                  # CLI 入口
+├── server/                     # 在线编辑器后端
+│   └── FastAPI + SQLite（认证、模板、草稿、导出）
+├── web/                        # 在线编辑器前端
+│   ├── app/                    # Next.js App Router
+│   ├── components/editor/      # BlockNote 编辑器组件
+│   └── lib/                    # 转换器、状态管理
 ├── tests/                      # 测试（pytest）
-├── scripts/                    # 辅助脚本
+├── scripts/                    # 辅助脚本（含 editor.sh）
 ├── data/examples/              # 示例 payload
 ├── templates/                  # 示例模板
-├── docs/                       # 文档
-│   ├── report_engine_payload_spec.md
-│   ├── report_engine_template_spec.md
-│   └── phase1_status.md
-└── output/                     # 输出目录
+└── docs/                       # 文档
 ```
 
 ---
