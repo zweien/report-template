@@ -36,6 +36,8 @@
   --border: var(--border-solid);
   --input: var(--border-solid);
   --ring: var(--brand);
+  --primary: #08090a;
+  --primary-foreground: #f7f8f8;
   --accent: #f1f5f9;
   --accent-foreground: var(--text-primary);
 }
@@ -74,6 +76,8 @@
   --border: var(--border-solid);
   --input: #2a2a2e;
   --ring: var(--brand);
+  --primary: #f7f8f8;
+  --primary-foreground: #08090a;
   --accent: #1e1e22;
   --accent-foreground: var(--text-primary);
 }
@@ -91,6 +95,8 @@
 .border-input { border-color: var(--input) !important; }
 .bg-accent { background-color: var(--accent) !important; }
 .text-accent-foreground { color: var(--accent-foreground) !important; }
+.bg-primary { background-color: var(--primary) !important; }
+.text-primary-foreground { color: var(--primary-foreground) !important; }
 .bg-input\/30 { background-color: color-mix(in srgb, var(--input) 30%) !important; }
 .bg-input\/50 { background-color: color-mix(in srgb, var(--input) 50%) !important; }
 
