@@ -14,5 +14,28 @@ build/
 
 output/
 
-# Server database
+# Server database & uploads
 data/editor.db
+data/uploads/
+data/uploaded_templates/
+
+# Node.js
+node_modules/
+package-lock.json
+
+# Next.js
+.next/
+web/.next/
+
+# Environment
+.env
+.env.local
+web/.env.local
+
+# Playwright CLI
+.playwright-cli/
+web/.playwright-cli/
+web/app/.playwright-cli/
+
+# Superpowers
+.superpowers/
