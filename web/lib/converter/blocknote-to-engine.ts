@@ -136,6 +136,7 @@ function convertBlock(block: BlockNoteBlock): EngineBlock | null {
 /**
  * Convert an array of BlockNote blocks into report-engine blocks.
  * Consecutive list items are merged into a single list block.
+ * tableCaption blocks are merged into the preceding table's title.
  */
 export function blocknoteToEngineBlocks(
   blocks: BlockNoteBlock[]
@@ -178,6 +179,16 @@ export function blocknoteToEngineBlocks(
         i++;
       }
       result.push({ type: "checklist", items, checked });
+      continue;
+    }
+
+    // tableCaption: merge into preceding table's title, skip as standalone block
+    if (block.type === "tableCaption") {
+      const captionText = block.props?.text || "";
+      if (captionText && result.length > 0 && result[result.length - 1].type === "table") {
+        result[result.length - 1].title = captionText;
+      }
+      i++;
       continue;
     }
 

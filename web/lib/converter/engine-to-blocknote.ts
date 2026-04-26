@@ -88,6 +88,23 @@ export function engineToBlocknoteBlocks(
           content: buildTableContent(block.headers || [], block.rows || []),
           props: { textColor: {} },
         }));
+        if (block.title) {
+          result.push(bn("tableCaption", {
+            props: { text: block.title },
+          }));
+        }
+        break;
+
+      case "three_line_table":
+        result.push(bn("table", {
+          content: buildTableContent(block.headers || [], block.rows || []),
+          props: { textColor: {} },
+        }));
+        if (block.title) {
+          result.push(bn("tableCaption", {
+            props: { text: block.title },
+          }));
+        }
         break;
 
       case "quote":

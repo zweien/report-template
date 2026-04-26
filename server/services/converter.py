@@ -6,7 +6,14 @@ def _extract_text(content: Any) -> str:
     if isinstance(content, str):
         return content
     if isinstance(content, list):
-        return "".join(segment.get("text", "") for segment in content if isinstance(segment, dict))
+        parts = []
+        for segment in content:
+            if isinstance(segment, dict):
+                text = segment.get("text", "")
+                if isinstance(text, dict):
+                    text = text.get("text", str(text))
+                parts.append(str(text))
+        return "".join(parts)
     return ""
 
 
@@ -135,6 +142,12 @@ def convert_blocknote_blocks(blocks: List[dict]) -> List[dict]:
             converted = _convert_table(block)
             if converted:
                 result.append(converted)
+        elif block_type == "tableCaption":
+            caption_text = block.get("props", {}).get("text", "")
+            if caption_text and result and result[-1].get("type") == "table":
+                result[-1]["title"] = caption_text
+            i += 1
+            continue
         elif block_type == "quote":
             result.append(_convert_quote(block))
         elif block_type == "codeBlock":
