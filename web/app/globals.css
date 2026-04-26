@@ -127,6 +127,12 @@ body {
   --bn-font-family: "Inter Variable", "Inter", system-ui, sans-serif !important;
 }
 
+/* AI menu loader spinner — use theme-aware brand color instead of hardcoded #e8eaed */
+.bn-suggestion-menu-loader svg,
+.bn-combobox-right-section svg {
+  fill: var(--brand) !important;
+}
+
 .bn-root,
 [data-radix-popper-content-wrapper] {
   --bn-colors-menu-background: var(--bg-surface) !important;

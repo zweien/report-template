@@ -1,11 +1,21 @@
 "use client";
 
-import { useCreateBlockNote, SuggestionMenuController, getDefaultReactSlashMenuItems } from "@blocknote/react";
+import { useCreateBlockNote, SuggestionMenuController, getDefaultReactSlashMenuItems, FormattingToolbar, FormattingToolbarController, getFormattingToolbarItems } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
 import { filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from "@blocknote/core/extensions";
 import "@blocknote/shadcn/style.css";
+import "@blocknote/xl-ai/style.css";
 import { useCallback, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
+import { DefaultChatTransport } from "ai";
+import {
+  AIExtension,
+  AIMenuController,
+  AIToolbarButton,
+  getAISlashMenuItems,
+} from "@blocknote/xl-ai";
+import { en as coreDictionary } from "@blocknote/core/locales";
+import { en as aiDictionary } from "@blocknote/xl-ai/locales";
 import {
   engineToBlocknoteBlocks,
   type EngineBlock,
@@ -53,6 +63,8 @@ function prepareBlocks(blocks: EngineBlock[]): any[] {
   });
 }
 
+const aiTransport = new DefaultChatTransport({ api: "/api/chat" });
+
 export default function SectionEditor({ blocks, onChange, scrollToBlockId, onScrolled }: SectionEditorProps) {
   const { resolvedTheme } = useTheme();
   const onChangeRef = useRef(onChange);
@@ -62,6 +74,10 @@ export default function SectionEditor({ blocks, onChange, scrollToBlockId, onScr
 
   const editor = useCreateBlockNote({
     schema,
+    dictionary: { ...coreDictionary, ai: aiDictionary },
+    extensions: [
+      AIExtension({ transport: aiTransport }),
+    ],
     uploadFile: async (file: File) => {
       const formData = new FormData();
       formData.append("file", file);
@@ -162,6 +178,11 @@ export default function SectionEditor({ blocks, onChange, scrollToBlockId, onScr
       }
       items.splice(insertIdx, 0, mermaidItem, captionItem);
 
+      // Add AI slash menu items
+      // Add AI slash menu items
+      const aiItems = getAISlashMenuItems(editor);
+      items.push(...aiItems);
+
       return filterSuggestionItems(items, query);
     },
     [editor],
@@ -174,9 +195,18 @@ export default function SectionEditor({ blocks, onChange, scrollToBlockId, onScr
         onChange={handleEditorChange}
         theme={resolvedTheme === "light" ? "light" : "dark"}
         slashMenu={false}
+        formattingToolbar={false}
         sideMenu
-        formattingToolbar
       >
+        <FormattingToolbarController
+          formattingToolbar={() => (
+            <FormattingToolbar>
+              {getFormattingToolbarItems()}
+              <AIToolbarButton key="ai" />
+            </FormattingToolbar>
+          )}
+        />
+        <AIMenuController />
         <SuggestionMenuController
           triggerCharacter="/"
           getItems={getSlashMenuItems}
