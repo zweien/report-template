@@ -5,6 +5,7 @@ import { BlockNoteView } from "@blocknote/shadcn";
 import { filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from "@blocknote/core/extensions";
 import "@blocknote/shadcn/style.css";
 import { useCallback, useEffect, useRef } from "react";
+import { useTheme } from "next-themes";
 import {
   engineToBlocknoteBlocks,
   type EngineBlock,
@@ -53,6 +54,7 @@ function prepareBlocks(blocks: EngineBlock[]): any[] {
 }
 
 export default function SectionEditor({ blocks, onChange, scrollToBlockId, onScrolled }: SectionEditorProps) {
+  const { resolvedTheme } = useTheme();
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
@@ -170,7 +172,7 @@ export default function SectionEditor({ blocks, onChange, scrollToBlockId, onScr
       <BlockNoteView
         editor={editor}
         onChange={handleEditorChange}
-        theme="dark"
+        theme={resolvedTheme === "light" ? "light" : "dark"}
         slashMenu={false}
         sideMenu
         formattingToolbar

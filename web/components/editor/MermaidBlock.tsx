@@ -67,13 +67,13 @@ function MermaidBlockRender({ block, editor }: ReactCustomBlockRenderProps<any>)
 
   return (
     <div
-      className="my-2 rounded-lg border border-neutral-700 bg-neutral-900"
+      className="my-2 rounded-lg border border-[var(--border-standard)] bg-[var(--bg-surface)]"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       {/* Hover toolbar */}
-      <div className="flex items-center justify-between border-b border-neutral-700 px-3 py-1.5">
-        <span className="text-xs font-medium text-neutral-400">Mermaid</span>
+      <div className="flex items-center justify-between border-b border-[var(--border-standard)] px-3 py-1.5">
+        <span className="text-xs font-medium text-[var(--text-secondary)]">Mermaid</span>
         <div
           className={`flex gap-1 transition-opacity ${hovered || mode === "preview" ? "opacity-100" : "opacity-0"}`}
         >
@@ -82,8 +82,8 @@ function MermaidBlockRender({ block, editor }: ReactCustomBlockRenderProps<any>)
             onClick={() => setMode("code")}
             className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
               mode === "code"
-                ? "bg-blue-600 text-white"
-                : "bg-neutral-700 text-neutral-300 hover:bg-neutral-600"
+                ? "bg-[var(--brand)] text-white"
+                : "bg-[var(--border-standard)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]"
             }`}
           >
             代码
@@ -93,8 +93,8 @@ function MermaidBlockRender({ block, editor }: ReactCustomBlockRenderProps<any>)
             onClick={() => setMode("preview")}
             className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
               mode === "preview"
-                ? "bg-blue-600 text-white"
-                : "bg-neutral-700 text-neutral-300 hover:bg-neutral-600"
+                ? "bg-[var(--brand)] text-white"
+                : "bg-[var(--border-standard)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]"
             }`}
           >
             预览
@@ -111,7 +111,7 @@ function MermaidBlockRender({ block, editor }: ReactCustomBlockRenderProps<any>)
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             placeholder="graph TD&#10;  A --> B"
-            className="min-h-[120px] w-full resize-y rounded border border-neutral-700 bg-neutral-950 p-3 font-mono text-sm text-neutral-200 placeholder-neutral-500 focus:border-blue-500 focus:outline-none"
+            className="min-h-[120px] w-full resize-y rounded border border-[var(--border-standard)] bg-[var(--bg-panel)] p-3 font-mono text-sm text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:border-[var(--brand)] focus:outline-none"
             rows={Math.max(5, localCode.split("\n").length + 1)}
           />
         ) : (

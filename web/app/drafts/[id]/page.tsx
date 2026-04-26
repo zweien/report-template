@@ -8,6 +8,7 @@ import SectionEditor from "@/components/editor/SectionEditor";
 import type { Payload } from "@/lib/stores/draft-store";
 import OutlinePanel from "@/components/editor/OutlinePanel";
 import CommandPalette from "@/components/CommandPalette";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function EditorPage() {
   const params = useParams();
@@ -120,7 +121,7 @@ export default function EditorPage() {
   if (authLoading || loading || !draft) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#5B6CF0] border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
       </div>
     );
   }
@@ -140,11 +141,11 @@ export default function EditorPage() {
   return (
     <div className="flex h-screen flex-col">
       {/* Top bar */}
-      <header className="flex h-12 items-center justify-between border-b border-white/[0.06] bg-[#141415] px-4">
+      <header className="flex h-12 items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-panel)] px-4">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/dashboard")}
-            className="text-sm text-[#8B8B93] hover:text-[#E8E8ED]"
+            className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           >
             ← Back
           </button>
@@ -155,7 +156,7 @@ export default function EditorPage() {
           />
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-[#8B8B93]">
+          <span className="text-xs text-[var(--text-secondary)]">
             {saveStatus === "saving" && "Saving..."}
             {saveStatus === "saved" && "Saved"}
             {saveStatus === "error" && "Save failed"}
@@ -170,29 +171,30 @@ export default function EditorPage() {
           />
           <button
             onClick={() => importInputRef.current?.click()}
-            className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-[#8B8B93] hover:bg-white/5"
+            className="rounded-md border border-[var(--border-standard)] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-transparent-hover)]"
           >
             Import
           </button>
           <button
             onClick={save}
             disabled={!isDirty || saveStatus === "saving"}
-            className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-[#8B8B93] hover:bg-white/5 disabled:opacity-50"
+            className="rounded-md border border-[var(--border-standard)] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-transparent-hover)] disabled:opacity-50"
           >
             Save
           </button>
           <button
             onClick={exportDocx}
-            className="rounded-md bg-[#5B6CF0] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#5B6CF0]/90"
+            className="rounded-md bg-[var(--brand)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--brand)]/90"
           >
             Export .docx
           </button>
+          <ThemeToggle />
           <button
             onClick={() => setOutlineOpen((v) => !v)}
             className={`rounded-md border px-2.5 py-1.5 text-xs transition-colors ${
               outlineOpen
-                ? "border-[#5B6CF0]/40 text-[#5B6CF0]"
-                : "border-white/10 text-[#8B8B93] hover:bg-white/5"
+                ? "border-[var(--brand)]/40 text-[var(--brand)]"
+                : "border-[var(--border-standard)] text-[var(--text-secondary)] hover:bg-[var(--surface-transparent-hover)]"
             }`}
             title={outlineOpen ? "Hide outline" : "Show outline"}
           >
@@ -206,8 +208,8 @@ export default function EditorPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-56 border-r border-white/[0.06] bg-[#141415] p-3 overflow-y-auto">
-          <p className="mb-2 text-xs font-medium text-[#8B8B93]">Sections</p>
+        <aside className="w-56 border-r border-[var(--border-subtle)] bg-[var(--bg-panel)] p-3 overflow-y-auto">
+          <p className="mb-2 text-xs font-medium text-[var(--text-secondary)]">Sections</p>
           <div className="space-y-1">
             {sectionIds.map((id) => {
               const enabled = draft.section_enabled?.[id] !== false;
@@ -216,8 +218,8 @@ export default function EditorPage() {
                   key={id}
                   className={`group flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors ${
                     activeSection === id
-                      ? "bg-[#5B6CF0]/12 text-[#E8E8ED]"
-                      : "text-[#8B8B93] hover:bg-white/[0.04] hover:text-[#E8E8ED]"
+                      ? "bg-[var(--brand-10)] text-[var(--text-primary)]"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--surface-transparent)] hover:text-[var(--text-primary)]"
                   }`}
                 >
                   <button
@@ -231,7 +233,7 @@ export default function EditorPage() {
                   <button
                     onClick={(e) => { e.stopPropagation(); toggleSection(id); scheduleAutoSave(); }}
                     className={`flex-shrink-0 h-4 w-7 rounded-full transition-colors ${
-                      enabled ? "bg-[#5B6CF0]" : "bg-white/10"
+                      enabled ? "bg-[var(--brand)]" : "bg-[var(--surface-transparent-hover)]"
                     }`}
                     title={enabled ? "Disable section" : "Enable section"}
                   >
@@ -247,17 +249,17 @@ export default function EditorPage() {
           </div>
 
           {/* Context vars */}
-          <div className="mt-6 border-t border-white/[0.06] pt-4">
-            <p className="mb-2 text-xs font-medium text-[#8B8B93]">Context</p>
+          <div className="mt-6 border-t border-[var(--border-subtle)] pt-4">
+            <p className="mb-2 text-xs font-medium text-[var(--text-secondary)]">Context</p>
             {Object.entries(draft.context).map(([key, value]) => (
               <div key={key} className="mb-2">
-                <label className="mb-0.5 block text-xs text-[#8B8B93]">
+                <label className="mb-0.5 block text-xs text-[var(--text-secondary)]">
                   {key}
                 </label>
                 <input
                   value={value as string}
                   onChange={(e) => updateContext(key, e.target.value)}
-                  className="w-full rounded-md border border-white/[0.06] bg-white/[0.03] px-2 py-1.5 text-xs outline-none focus:border-[#5B6CF0]/50"
+                  className="w-full rounded-md border border-[var(--border-subtle)] bg-[var(--surface-transparent)] px-2 py-1.5 text-xs outline-none focus:border-[var(--brand)]/50"
                 />
               </div>
             ))}
@@ -265,7 +267,7 @@ export default function EditorPage() {
         </aside>
 
         {/* Editor area - placeholder for BlockNote */}
-        <main className="flex-1 overflow-y-auto bg-[#0F0F10] p-6">
+        <main className="flex-1 overflow-y-auto bg-[var(--bg-canvas)] p-6">
           <div className="mx-auto max-w-3xl">
             <h2 className="mb-4 text-base font-medium">
               {activeSection
@@ -273,11 +275,11 @@ export default function EditorPage() {
                 .replace(/\b\w/g, (c) => c.toUpperCase())}
             </h2>
             {draft.section_enabled?.[activeSection] === false ? (
-              <div className="flex flex-col items-center justify-center py-16 text-[#8B8B93]">
+              <div className="flex flex-col items-center justify-center py-16 text-[var(--text-secondary)]">
                 <p className="text-sm">This section is disabled and will not appear in exports.</p>
                 <button
                   onClick={() => { toggleSection(activeSection); scheduleAutoSave(); }}
-                  className="mt-3 rounded-md bg-[#5B6CF0] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#5B6CF0]/90"
+                  className="mt-3 rounded-md bg-[var(--brand)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--brand)]/90"
                 >
                   Enable section
                 </button>

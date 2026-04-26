@@ -73,10 +73,10 @@ export default function DashboardPage() {
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-lg font-semibold">Report Editor</h1>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-[#8B8B93]">{user.username}</span>
+          <span className="text-sm text-[var(--text-secondary)]">{user.username}</span>
           <button
             onClick={logout}
-            className="text-sm text-[#8B8B93] hover:text-[#E8E8ED]"
+            className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           >
             Sign out
           </button>
@@ -88,7 +88,7 @@ export default function DashboardPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-16 animate-pulse rounded-lg bg-white/5"
+              className="h-16 animate-pulse rounded-lg bg-[var(--surface-transparent-hover)]"
             />
           ))}
         </div>
@@ -96,18 +96,18 @@ export default function DashboardPage() {
         <>
           <section className="mb-8">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-medium text-[#8B8B93]">
+              <h2 className="text-sm font-medium text-[var(--text-secondary)]">
                 Templates
               </h2>
               <Link
                 href="/dashboard/templates/upload"
-                className="rounded-md bg-[#5B6CF0] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#5B6CF0]/90"
+                className="rounded-md bg-[var(--brand)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--brand)]/90"
               >
                 Upload
               </Link>
             </div>
             {templates.length === 0 ? (
-              <p className="text-sm text-[#8B8B93]">
+              <p className="text-sm text-[var(--text-secondary)]">
                 No templates yet. Upload a .docx to get started.
               </p>
             ) : (
@@ -115,24 +115,24 @@ export default function DashboardPage() {
                 {templates.map((t) => (
                   <div
                     key={t.id}
-                    className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-[#141415] px-4 py-3"
+                    className="flex items-center justify-between rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-4 py-3"
                   >
                     <div>
                       <p className="text-sm font-medium">{t.name}</p>
-                      <p className="text-xs text-[#8B8B93]">
+                      <p className="text-xs text-[var(--text-secondary)]">
                         {t.parsed_structure.sections.length} sections
                       </p>
                     </div>
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleNewDraft(t.id)}
-                        className="rounded-md bg-[#5B6CF0]/10 px-3 py-1.5 text-xs font-medium text-[#5B6CF0] hover:bg-[#5B6CF0]/20"
+                        className="rounded-md bg-[var(--brand-10)] px-3 py-1.5 text-xs font-medium text-[var(--brand)] hover:bg-[var(--brand-20)]"
                       >
                         New Draft
                       </button>
                       <button
                         onClick={() => handleDeleteTemplate(t.id)}
-                        className="rounded-md px-2 py-1.5 text-xs text-[#8B8B93] hover:bg-white/5 hover:text-red-400"
+                        className="rounded-md px-2 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-transparent-hover)] hover:text-red-400"
                       >
                         Delete
                       </button>
@@ -144,30 +144,30 @@ export default function DashboardPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-sm font-medium text-[#8B8B93]">
+            <h2 className="mb-3 text-sm font-medium text-[var(--text-secondary)]">
               Drafts
             </h2>
             {drafts.length === 0 ? (
-              <p className="text-sm text-[#8B8B93]">No drafts yet.</p>
+              <p className="text-sm text-[var(--text-secondary)]">No drafts yet.</p>
             ) : (
               <div className="space-y-2">
                 {drafts.map((d) => (
                   <div
                     key={d.id}
-                    className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-[#141415] px-4 py-3"
+                    className="flex items-center justify-between rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-4 py-3"
                   >
                     <Link href={`/drafts/${d.id}`} className="flex-1">
-                      <p className="text-sm font-medium hover:text-[#5B6CF0]">
+                      <p className="text-sm font-medium hover:text-[var(--brand)]">
                         {d.title}
                       </p>
-                      <p className="text-xs text-[#8B8B93]">
+                      <p className="text-xs text-[var(--text-secondary)]">
                         Updated{" "}
                         {new Date(d.updated_at).toLocaleString()}
                       </p>
                     </Link>
                     <button
                       onClick={() => handleDeleteDraft(d.id)}
-                      className="rounded-md px-2 py-1.5 text-xs text-[#8B8B93] hover:bg-white/5 hover:text-red-400"
+                      className="rounded-md px-2 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-transparent-hover)] hover:text-red-400"
                     >
                       Delete
                     </button>

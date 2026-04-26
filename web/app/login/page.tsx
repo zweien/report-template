@@ -37,7 +37,7 @@ export default function LoginPage() {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm outline-none focus:border-[#5B6CF0]"
+          className="w-full rounded-md border border-[var(--border-standard)] bg-[var(--surface-transparent-hover)] px-3 py-2 text-sm outline-none focus:border-[var(--brand)]"
           required
         />
         <input
@@ -45,19 +45,19 @@ export default function LoginPage() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm outline-none focus:border-[#5B6CF0]"
+          className="w-full rounded-md border border-[var(--border-standard)] bg-[var(--surface-transparent-hover)] px-3 py-2 text-sm outline-none focus:border-[var(--brand)]"
           required
         />
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-[#5B6CF0] px-3 py-2 text-sm font-medium text-white hover:bg-[#5B6CF0]/90 disabled:opacity-50"
+          className="w-full rounded-md bg-[var(--brand)] px-3 py-2 text-sm font-medium text-white hover:bg-[var(--brand)]/90 disabled:opacity-50"
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>
-        <p className="text-center text-sm text-[#8B8B93]">
+        <p className="text-center text-sm text-[var(--text-secondary)]">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-[#5B6CF0] hover:underline">
+          <Link href="/register" className="text-[var(--brand)] hover:underline">
             Register
           </Link>
         </p>

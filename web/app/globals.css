@@ -2,40 +2,83 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ─── Light Theme (default :root) ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --popover: #ffffff;
-  --popover-foreground: #171717;
-  --card: #ffffff;
-  --card-foreground: #171717;
+  --bg-canvas: #f7f8f8;
+  --bg-panel: #f3f4f5;
+  --bg-surface: #ffffff;
+  --bg-hover: #e6e8eb;
+  --text-primary: #08090a;
+  --text-secondary: #3d4250;
+  --text-tertiary: #62666d;
+  --text-quaternary: #8a8f98;
+  --brand: #5e6ad2;
+  --brand-accent: #5e6ad2;
+  --brand-hover: #7170ff;
+  --brand-10: rgba(94, 106, 210, 0.10);
+  --brand-20: rgba(94, 106, 210, 0.20);
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-standard: rgba(0, 0, 0, 0.10);
+  --border-solid: #d0d6e0;
+  --surface-transparent: rgba(0, 0, 0, 0.03);
+  --surface-transparent-hover: rgba(0, 0, 0, 0.06);
+  --placeholder: rgba(0, 0, 0, 0.25);
+
+  /* shadcn compat */
+  --background: var(--bg-canvas);
+  --foreground: var(--text-primary);
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-primary);
+  --card: var(--bg-surface);
+  --card-foreground: var(--text-primary);
   --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #3b82f6;
+  --muted-foreground: var(--text-tertiary);
+  --border: var(--border-solid);
+  --input: var(--border-solid);
+  --ring: var(--brand);
   --accent: #f1f5f9;
-  --accent-foreground: #171717;
+  --accent-foreground: var(--text-primary);
 }
 
+/* ─── Dark Theme ─── */
 .dark {
-  --background: #0A0A0B;
-  --foreground: #E8E8ED;
-  --popover: #1a1a1c;
-  --popover-foreground: #E8E8ED;
-  --card: #1a1a1c;
-  --card-foreground: #E8E8ED;
+  --bg-canvas: #08090a;
+  --bg-panel: #0f1011;
+  --bg-surface: #191a1b;
+  --bg-hover: #28282c;
+  --text-primary: #f7f8f8;
+  --text-secondary: #d0d6e0;
+  --text-tertiary: #8a8f98;
+  --text-quaternary: #62666d;
+  --brand: #5e6ad2;
+  --brand-accent: #7170ff;
+  --brand-hover: #828fff;
+  --brand-10: rgba(94, 106, 210, 0.12);
+  --brand-20: rgba(94, 106, 210, 0.24);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-standard: rgba(255, 255, 255, 0.08);
+  --border-solid: #23252a;
+  --surface-transparent: rgba(255, 255, 255, 0.03);
+  --surface-transparent-hover: rgba(255, 255, 255, 0.06);
+  --placeholder: rgba(255, 255, 255, 0.25);
+
+  /* shadcn compat */
+  --background: var(--bg-canvas);
+  --foreground: var(--text-primary);
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-primary);
+  --card: var(--bg-surface);
+  --card-foreground: var(--text-primary);
   --muted: #1e1e22;
-  --muted-foreground: #8b8b94;
-  --border: #2a2a2e;
+  --muted-foreground: var(--text-tertiary);
+  --border: var(--border-solid);
   --input: #2a2a2e;
-  --ring: #5b6cf0;
+  --ring: var(--brand);
   --accent: #1e1e22;
-  --accent-foreground: #E8E8ED;
+  --accent-foreground: var(--text-primary);
 }
 
-/* Tailwind v4 JIT can't scan BlockNote's node_modules classes.
-   Provide shadcn/ui utility rules as plain CSS for BlockNote popups. */
+/* ─── shadcn utility classes for BlockNote portals ─── */
 .bg-popover { background-color: var(--popover) !important; }
 .text-popover-foreground { color: var(--popover-foreground) !important; }
 .bg-card { background-color: var(--card) !important; }
@@ -51,44 +94,38 @@
 .bg-input\/30 { background-color: color-mix(in srgb, var(--input) 30%) !important; }
 .bg-input\/50 { background-color: color-mix(in srgb, var(--input) 50%) !important; }
 
+/* ─── Base ─── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: "Inter Variable", "Inter", system-ui, -apple-system, sans-serif;
+  font-feature-settings: "cv01", "ss03";
 }
 
-/* Linear-style scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+.dark ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
+.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+:not(.dark) ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 3px; }
+:not(.dark) ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
 
-/* BlockNote dark theme overrides */
+/* ─── BlockNote Editor ─── */
 .bn-container {
-  --bn-colors-editor-background: #141415 !important;
-  --bn-colors-menu-text: #E8E8ED !important;
-  --bn-colors-menu-background: #1a1a1c !important;
-  --bn-colors-tooltip-background: #1a1a1c !important;
-  --bn-colors-hovered-background: rgba(255, 255, 255, 0.04) !important;
-  --bn-colors-selected-background: rgba(91, 108, 240, 0.12) !important;
-  --bn-font-family: "Inter", system-ui, sans-serif !important;
+  --bn-colors-editor-background: var(--bg-panel) !important;
+  --bn-colors-menu-text: var(--text-primary) !important;
+  --bn-colors-menu-background: var(--bg-surface) !important;
+  --bn-colors-tooltip-background: var(--bg-surface) !important;
+  --bn-colors-hovered-background: var(--surface-transparent-hover) !important;
+  --bn-colors-selected-background: var(--brand-10) !important;
+  --bn-font-family: "Inter Variable", "Inter", system-ui, sans-serif !important;
 }
 
-/* BlockNote menus are portalled to body, set vars globally */
 .bn-root,
-.dark [data-radix-popper-content-wrapper] {
-  --bn-colors-menu-background: #1a1a1c !important;
-  --bn-colors-menu-text: #E8E8ED !important;
-  --bn-colors-tooltip-background: #1a1a1c !important;
+[data-radix-popper-content-wrapper] {
+  --bn-colors-menu-background: var(--bg-surface) !important;
+  --bn-colors-menu-text: var(--text-primary) !important;
+  --bn-colors-tooltip-background: var(--bg-surface) !important;
 }
 
 .bn-editor {
@@ -100,7 +137,6 @@ body {
   margin-top: 2px !important;
 }
 
-/* Placeholder text */
 .bn-inline-content[data-is-empty="true"]::before {
-  color: rgba(255, 255, 255, 0.25) !important;
+  color: var(--placeholder) !important;
 }

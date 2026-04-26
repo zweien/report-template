@@ -44,13 +44,13 @@ function TableCaptionBlockRender({ block, editor }: ReactCustomBlockRenderProps<
 
   return (
     <div className="my-1 flex items-center justify-center gap-2">
-      <span className="text-xs text-neutral-500">表题</span>
+      <span className="text-xs text-[var(--text-tertiary)]">表题</span>
       <input
         type="text"
         value={localText}
         onChange={handleChange}
         placeholder="输入表格标题…"
-        className="w-64 border-b border-neutral-600 bg-transparent px-1 py-0.5 text-center text-sm text-neutral-300 placeholder-neutral-600 focus:border-blue-500 focus:outline-none"
+        className="w-64 border-b border-[var(--border-standard)] bg-transparent px-1 py-0.5 text-center text-sm text-[var(--text-primary)] placeholder-[var(--text-quaternary)] focus:border-[var(--brand)] focus:outline-none"
       />
     </div>
   );
