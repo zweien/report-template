@@ -7,8 +7,12 @@
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from docx import Document
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "src"))
+from report_engine.prompt_parser import extract_prompts
 
 
 def analyze_template(template_path: str) -> dict:
@@ -50,6 +54,9 @@ def analyze_template(template_path: str) -> dict:
                 "text": para.text.strip(),
             })
 
+    # 提取 PROMPT 注释
+    prompts = extract_prompts(doc)
+
     return {
         "path": template_path,
         "scalar_placeholders": sorted(set(scalars)),
@@ -57,6 +64,7 @@ def analyze_template(template_path: str) -> dict:
         "conditional_flags": sorted(set(flags)),
         "styles": sorted(styles),
         "headings": headings,
+        "prompts": prompts,
         "paragraphs_count": len(doc.paragraphs),
         "tables_count": len(doc.tables),
     }
