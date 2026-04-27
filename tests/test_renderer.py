@@ -44,3 +44,27 @@ def test_render_report_can_skip_template_checks(minimal_template, advanced_paylo
     doc = Document(str(output_path))
     full_text = "\n".join(p.text for p in doc.paragraphs)
     assert "测试项目" in full_text
+
+
+def test_render_report_filters_prompt_paragraphs(minimal_template, advanced_payload, tmp_path):
+    """渲染时应自动删除 [[PROMPT: ...]] 段落。"""
+    from docx import Document
+
+    doc = Document(minimal_template)
+    # Insert a PROMPT paragraph before the first conditional block
+    prompt_para = doc.add_paragraph("[[PROMPT: 研究内容: 请撰写研究内容 | mode=auto]]")
+    body = doc.element.body
+    body.insert(2, prompt_para._element)
+    doc.save(minimal_template)
+
+    output_path = tmp_path / "result_no_prompt.docx"
+    render_report(minimal_template, str(output_path), advanced_payload)
+
+    doc = Document(str(output_path))
+    full_text = "\n".join(p.text for p in doc.paragraphs)
+
+    # PROMPT text should NOT appear in output
+    assert "[[PROMPT:" not in full_text
+    assert "请撰写研究内容" not in full_text
+    # Normal content should still be present
+    assert "测试项目" in full_text
