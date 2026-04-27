@@ -1,0 +1,106 @@
+{
+  "context": {
+    "项目名称": "（请填写项目名称）",
+    "申请单位": "（请填写申请单位）",
+    "项目负责人": "（请填写项目负责人）",
+    "项目周期": "（请填写项目周期）"
+  },
+  "sections": [
+    {
+      "id": "toc",
+      "placeholder": "目录_SUBDOC",
+      "flag_name": "ENABLE_目录",
+      "enabled": true,
+      "blocks": [
+        {"type": "toc_placeholder", "title": "目 录"}
+      ]
+    },
+    {
+      "id": "basis",
+      "placeholder": "立项依据_SUBDOC",
+      "flag_name": "ENABLE_立项依据",
+      "enabled": true,
+      "title": "立项依据",
+      "blocks": [
+        {"type": "paragraph", "text": "（请填写立项依据内容）"}
+      ]
+    },
+    {
+      "id": "objectives",
+      "placeholder": "研究目标_SUBDOC",
+      "flag_name": "ENABLE_研究目标",
+      "enabled": true,
+      "title": "研究目标",
+      "blocks": [
+        {"type": "paragraph", "text": "（请填写研究目标内容）"}
+      ]
+    },
+    {
+      "id": "key_problems",
+      "placeholder": "拟解决的关键科学问题_SUBDOC",
+      "flag_name": "ENABLE_拟解决的关键科学问题",
+      "enabled": true,
+      "title": "拟解决的关键科学问题",
+      "blocks": [
+        {"type": "paragraph", "text": "（请填写拟解决的关键科学问题）"}
+      ]
+    },
+    {
+      "id": "content",
+      "placeholder": "研究内容_SUBDOC",
+      "flag_name": "ENABLE_研究内容",
+      "enabled": true,
+      "title": "研究内容",
+      "blocks": [
+        {"type": "paragraph", "text": "（请填写研究内容）"}
+      ]
+    },
+    {
+      "id": "outlook",
+      "placeholder": "与其研究成果和应用前景_SUBDOC",
+      "flag_name": "ENABLE_与其研究成果和应用前景",
+      "enabled": true,
+      "title": "与其研究成果和应用前景",
+      "blocks": [
+        {"type": "paragraph", "text": "（请填写预期研究成果和应用前景）"}
+      ]
+    },
+    {
+      "id": "team_basis",
+      "placeholder": "研究团队研究基础及保障条件_SUBDOC",
+      "flag_name": "ENABLE_研究团队研究基础及保障条件",
+      "enabled": true,
+      "title": "研究团队研究基础及保障条件",
+      "blocks": [
+        {"type": "paragraph", "text": "（请填写研究团队研究基础及保障条件）"}
+      ]
+    },
+    {
+      "id": "members",
+      "placeholder": "项目组成员_SUBDOC",
+      "flag_name": "ENABLE_项目组成员",
+      "enabled": true,
+      "title": "项目组成员",
+      "blocks": [
+        {"type": "paragraph", "text": "（请填写项目组成员信息）"}
+      ]
+    },
+    {
+      "id": "budget",
+      "placeholder": "经费概算_SUBDOC",
+      "flag_name": "ENABLE_经费概算",
+      "enabled": true,
+      "title": "经费概算",
+      "blocks": [
+        {"type": "paragraph", "text": "（请填写经费概算）"}
+      ]
+    }
+  ],
+  "attachments": [],
+  "attachments_bundle": {
+    "enabled": false,
+    "placeholder": "APPENDICES_SUBDOC",
+    "flag_name": "ENABLE_APPENDICES"
+  },
+  "style_map": {}
+}
